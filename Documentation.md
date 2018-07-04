@@ -133,9 +133,7 @@ Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like t
 ```
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
 ```
-Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually.
-
-Or you can install via homebrew with `brew cask install minikube`
+Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually. Or you can install via homebrew with `brew cask install minikube`
 
 #### Windows
 Use browser download link from releases [link](https://github.com/kubernetes/minikube/releases)
@@ -152,6 +150,82 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
   - "Minikube Releases" at the Minikube Github repository
   - Debian-based Linux & Windows users should consider using the installer packages listed at the above URL
 ----
+
+## Basic Minikube Commands
+- Start minikube
+```
+minikube start
+```
+![](Documentation.assets/Documentation-0c94eae9.png)
+
+<br/>
+- Deploy a sample Kubernetes “deployment” to your local minikube
+```
+kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
+```
+![](Documentation.assets/Documentation-82459bc7.png)
+
+<br/>
+- Expose this deployment to an external network
+```
+kubectl expose deployment hello-minikube --type=NodePort
+```
+![](Documentation.assets/Documentation-9ca4bcc1.png)
+
+<br/>
+- List the “pods” of this deployment
+```
+kubectl get pod
+```
+![](Documentation.assets/Documentation-a6d7e9ca.png)
+
+<br/>
+- Access the sample service
+```
+curl $(minikube service hello-minikube --url)
+```
+![](Documentation.assets/Documentation-8254ce69.png)
+
+<br/>
+- Delete the deployment
+```
+kubectl delete deployment hello-minikube
+```
+![](Documentation.assets/Documentation-2ff58470.png)
+
+<br/>
+- Stop minikube
+```
+minikube stop
+```
+![](Documentation.assets/Documentation-e3aa6c6c.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Usage
 
