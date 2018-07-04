@@ -34,9 +34,9 @@ read the CNCF [announcement].
   - [Install kubectl](#install-kubectl)
   - [Install minikube](#install-minikube)
   - [Basic minikube commands](#basic-minikube-commands)
-- [Source Code Example](#source-code-example)
-- [Contributing](#contributing)
-- [License](#license)
+- [Source Code Example](#📙-source-code-example)
+- [Contributing](#💬-contributing)
+- [License](#📜-license)
 
 
 ## Environment
@@ -64,15 +64,17 @@ It depends on who you are & what you’re using it for
 [Official website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl)
 
 ### 1. Download the latest package for your OS**
-#### Linux
-```
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-```
-#### OS X
-```
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
-```
-#### Windows
+- #### Linux
+  ```
+  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+  ```
+
+- #### OS X
+  ```
+  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
+  ```
+
+- #### Windows
 Download the latest release v1.11.0 from [this link](https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe). Or if you have curl installed, use this command:
 ```
 curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe
