@@ -213,11 +213,9 @@ We will deploy the Tomcat App Server using the official docker image.
 
 #### 1. Define the deployment
 
-A Tomcat deployment:
-
 deployment.yaml file provide Kubernetes with the basic information of what the application needs to do.
 
-- deployment.yaml
+- [deployment.yaml](Source Code/Introduction to Kubernetes/Your First k8s App/deployment.yaml)
   ```yaml
   apiVersion: apps/v1beta2
   kind: Deployment
