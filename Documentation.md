@@ -216,7 +216,66 @@ We will deploy the Tomcat App Server using the official docker image.
 [(Back to top)](#-table-of-contents)
 
 ## 📙 Source Code Example
-- You can download latest code from [here](https://github.com/jleetutorial/kubernetes-demo).
+- You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
+
+A Tomcat deployment:
+
+deployment.yaml file provide Kubernetes with the basic information of what the application needs to do.
+
+- deployment.yaml
+  ```yaml
+  apiVersion: apps/v1beta2
+  kind: Deployment
+  metadata:
+    name: tomcat-deployment
+  spec:
+    selector:
+      matchLabels:
+        app: tomcat
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          app: tomcat
+      spec:
+        containers:
+        - name: tomcat
+          image: tomcat:9.0
+          ports:
+          - containerPort: 8080
+  ```
+
+In this file we are going to define
+- a deployment name `tomcat–deployment`
+- `one replica`, so one instance of one docker image
+- image is named `tomcat:9.0`
+- docker container `tomcat:9.0` exposes a port `8080` where Tomcat application server will listen by default
+
+Next, we will use the kubectl apply command to take the directives from this file
+and apply it to our cluster.
+```
+kubectl apply -f ./deployment.yaml
+```
+![](Documentation.assets/Documentation-e0e0130b.png)
+
+You'll see that the deployment was successfully created.
+
+Next step is to expose the deployment as a service. The kubectl expose command will create the actual service it explore it to the world.
+```
+kubectl expose deployment tomcat-deployment --type=NodePort
+```
+![](Documentation.assets/Documentation-b6c1f266.png)
+
+In order to find what port it was created on, we’ll use the minikupe service with the name of the service ––url command.
+```
+minikube service tomcat-deployment --url
+```
+![](Documentation.assets/Documentation-90405042.png)
+
+This will provide us with the URL including the port number that we can access or given expose service on. Copying this URL we will use curl to access our local service as you can see we will get the HTML of the default Apache Tomcat welcome page.
+![](Documentation.assets/Documentation-4a2392ab.png)
+
+
 
 [(Back to top)](#-table-of-contents)
 
