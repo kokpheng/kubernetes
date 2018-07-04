@@ -213,11 +213,6 @@ We will deploy the Tomcat App Server using the official docker image.
 
 #### 1. Define the deployment
 
-[(Back to top)](#-table-of-contents)
-
-## 📙 Source Code Example
-- You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
-
 A Tomcat deployment:
 
 deployment.yaml file provide Kubernetes with the basic information of what the application needs to do.
@@ -275,7 +270,10 @@ minikube service tomcat-deployment --url
 This will provide us with the URL including the port number that we can access or given expose service on. Copying this URL we will use curl to access our local service as you can see we will get the HTML of the default Apache Tomcat welcome page.
 ![](Documentation.assets/Documentation-4a2392ab.png)
 
+[(Back to top)](#-table-of-contents)
 
+## 📙 Source Code Example
+- You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
 
 [(Back to top)](#-table-of-contents)
 
