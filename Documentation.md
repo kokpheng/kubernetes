@@ -34,6 +34,7 @@ read the CNCF [announcement].
   - [Install kubectl](#install-kubectl)
   - [Install minikube](#install-minikube)
   - [Basic minikube commands](#basic-minikube-commands)
+- [Your First K8S App](#your-first-k8s-app)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -207,6 +208,13 @@ kubectl version
 
 [(Back to top)](#-table-of-contents)
 
+## Your First K8S App
+We will deploy the Tomcat App Server using the official docker image.
+
+#### 1. Define the deployment
+
+[(Back to top)](#-table-of-contents)
+
 ## 📙 Source Code Example
 - You can download latest code from [here](https://github.com/jleetutorial/kubernetes-demo).
 
@@ -226,3 +234,9 @@ Your contributions are always welcome! :tada:
 
 The MIT License (MIT) 2018
 > GitHub [@yinkokpheng](https://github.com/yinkokpheng)
+
+
+[GoDoc]: https://godoc.org/k8s.io/kubernetes
+[GoDoc Widget]: https://godoc.org/k8s.io/kubernetes?status.svg
+[Submit Queue]: http://submit-queue.k8s.io/#/ci
+[Submit Queue Widget]: http://submit-queue.k8s.io/health.svg?v=1
