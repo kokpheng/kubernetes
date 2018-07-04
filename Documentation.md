@@ -254,6 +254,7 @@ kubectl apply -f ./deployment.yaml
 You'll see that the deployment was successfully created.
 
 <br />
+
 **Next step** is to expose the deployment as a service. The kubectl expose command will create the actual service it explore it to the world.
 ```
 kubectl expose deployment tomcat-deployment --type=NodePort
@@ -261,6 +262,7 @@ kubectl expose deployment tomcat-deployment --type=NodePort
 ![](Documentation.assets/Documentation-b6c1f266.png)
 
 <br />
+
 In order to find what port it was created on, we’ll use the minikupe service with the name of the service ––url command.
 ```
 minikube service tomcat-deployment --url
