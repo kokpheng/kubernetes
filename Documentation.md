@@ -244,7 +244,7 @@ In this file we are going to define
 - image is named `tomcat:9.0`
 - docker container `tomcat:9.0` exposes a port `8080` where Tomcat application server will listen by default
 
-Next, we will use the kubectl apply command to take the directives from this file
+**Next**, we will use the kubectl apply command to take the directives from this file
 and apply it to our cluster.
 ```
 kubectl apply -f ./deployment.yaml
@@ -253,12 +253,14 @@ kubectl apply -f ./deployment.yaml
 
 You'll see that the deployment was successfully created.
 
-Next step is to expose the deployment as a service. The kubectl expose command will create the actual service it explore it to the world.
+<br />
+**Next step** is to expose the deployment as a service. The kubectl expose command will create the actual service it explore it to the world.
 ```
 kubectl expose deployment tomcat-deployment --type=NodePort
 ```
 ![](Documentation.assets/Documentation-b6c1f266.png)
 
+<br />
 In order to find what port it was created on, we’ll use the minikupe service with the name of the service ––url command.
 ```
 minikube service tomcat-deployment --url
