@@ -27,20 +27,17 @@ read the CNCF [announcement].
 
 ----
 
-## Table of Contents
+## 🚩 Table of Contents
 
 - [Environment](#environment)
 - [Minikube](#minikube-overview)
-  - []
-- [Usage](#usage)
-	- [Generator](#generator)
-- [Badge](#badge)
-- [Example Readmes](#example-readmes)
-- [Related Efforts](#related-efforts)
-- [Maintainers](#maintainers)
-- [Contribute](#contribute)
+  - [Install kubectl](#install-kubectl)
+  - [Install minikube](#install-minikube)
+  - [Basic minikube commands](#basic-minikube-commands)
+- [Source Code Example](#source-code-example)
+- [Contributing](#contributing)
 - [License](#license)
-- [Source Code Example](#source-code)
+
 
 ## Environment
 It depends on who you are & what you’re using it for
@@ -199,7 +196,7 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
 
 
 ## 📙 Source Code Example
-- [Download Code](https://github.com/jleetutorial/kubernetes-demo)
+- You can download latest code from [here](https://github.com/jleetutorial/kubernetes-demo).
 
 ## 💬 Contributing
 
@@ -213,4 +210,5 @@ Your contributions are always welcome! :tada:
 
 ## 📜 License
 
-The MIT License (MIT) 2018 - [Kokpheng Yin](https://github.com/yinkokpheng)
+The MIT License (MIT) 2018
+> GitHub [@yinkokpheng](https://github.com/yinkokpheng)
