@@ -118,7 +118,9 @@ Use Explorer to move the kubectl binary to a directory in your path of your choi
 ```
 kubectl version
 ```
+![](Documentation.assets/Documentation-8fedcb11.png)
 
+**Note:** Version and GitCommit might be different.
 
 
 
