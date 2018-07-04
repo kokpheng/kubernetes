@@ -75,27 +75,27 @@ It depends on who you are & what you’re using it for
   ```
 
 - #### Windows
-Download the latest release v1.11.0 from [this link](https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe). Or if you have curl installed, use this command:
-```
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe
-```
-To find out the latest stable version (for example, for scripting), take a look at https://storage.googleapis.com/kubernetes-release/release/stable.txt.
+  Download the latest release v1.11.0 from [this link](https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe). Or if you have curl installed, use this command:
+  ```
+  curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe
+  ```
+  To find out the latest stable version (for example, for scripting), take a look at https://storage.googleapis.com/kubernetes-release/release/stable.txt.
 
 ### 2. Make the binary executable (macOS and Linux only)
   ```
   chmod +x ./kubectl
   ```
 ### 3. Add the binary to your PATH
-#### Linux
-```
-sudo mv ./kubectl /usr/local/bin/kubectl
-```
-#### OS X
-```
-sudo mv ./kubectl /usr/local/bin/kubectl
-```
-#### Windows
-Use Explorer to move the kubectl binary to a directory in your path of your choice.
+- #### Linux
+  ```
+  sudo mv ./kubectl /usr/local/bin/kubectl
+  ```
+- #### OS X
+  ```
+  sudo mv ./kubectl /usr/local/bin/kubectl
+  ```
+- #### Windows
+  Use Explorer to move the kubectl binary to a directory in your path of your choice.
 
 ----
 - Latest installation instruction for macOS*, Linux, and Windows are always available online:
@@ -114,26 +114,27 @@ kubectl version
 
 ## Install minikube
 [Official minikude github](https://github.com/kubernetes/minikube/releases)
-#### Linux
-```
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
-```
-Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually.
-#### OS X
-```
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
-```
-Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually. Or you can install via homebrew with `brew cask install minikube`
+- #### Linux
+  ```
+  curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+  ```
+  Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually.
 
-#### Windows
-Use browser download link from releases [link](https://github.com/kubernetes/minikube/releases)
+- #### OS X
+  ```
+  curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+  ```
+  Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually. Or you can install via homebrew with `brew cask install minikube`
 
-###### Windows [Experimental]
-Download the `minikube-windows-amd64.exe` file, rename it to `minikube.exe` and add it to your path.
+- #### Windows
+  Use browser download link from releases [link](https://github.com/kubernetes/minikube/releases)
 
-###### Windows Installer [Experimental]
+  ###### Windows [Experimental]
+  Download the `minikube-windows-amd64.exe` file, rename it to `minikube.exe` and add it to your path.
 
-Download the `minikube-installer.exe` file, and execute the installer. This will automatically add minikube.exe to your path with an uninstaller available as well.
+  ###### Windows Installer [Experimental]
+
+  Download the `minikube-installer.exe` file, and execute the installer. This will automatically add minikube.exe to your path with an uninstaller available as well.
 
 ----
 - Latest installation instruction for macOS*, Linux, and Windows are always available online:
