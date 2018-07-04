@@ -74,7 +74,8 @@ It depends on who you are & what you’re using it for
 
 ## Install Kubectl
 [Official website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl)
-1. Download the latest package for your OS**
+
+### 1. Download the latest package for your OS**
 #### Linux
 ```
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -90,11 +91,11 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/w
 ```
 To find out the latest stable version (for example, for scripting), take a look at https://storage.googleapis.com/kubernetes-release/release/stable.txt.
 
-2. Make the binary executable (macOS and Linux only)
+### 2. Make the binary executable (macOS and Linux only)
   ```
   chmod +x ./kubectl
   ```
-3. Add the binary to your PATH
+### 3. Add the binary to your PATH
 #### Linux
 ```
 sudo mv ./kubectl /usr/local/bin/kubectl
