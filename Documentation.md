@@ -40,7 +40,8 @@ read the CNCF [announcement].
 ## Table of Contents
 
 - [Environment](#environment)
-- [Install](#install)
+- [Setup Environment](#setup)
+  - []
 - [Usage](#usage)
 	- [Generator](#generator)
 - [Badge](#badge)
@@ -66,13 +67,13 @@ It depends on who you are & what you’re using it for
 - Minikube will be a Kubernetes cluster running on your machine
 - We’ll start minikube and then connect to it from the kubernetes command line tools (kubectl), just as you will when connecting to kubernetes clusters running remotely
 
-## Installation Minikube Overview
+###### Step to install Minikube
 
 - Start with a Linux or Mac OS X machine with a hypervisor installed
 - Install kubectl
 - Install minikube
 
-## Install Kubectl
+## Install kubectl
 [Official website](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl)
 
 ### 1. Download the latest package for your OS**
@@ -114,7 +115,7 @@ Use Explorer to move the kubectl binary to a directory in your path of your choi
   - Google Cloud Platform users may also use the Google Cloud Platform tools to install kubectl, consult Google’s SDK for information
 ----
 
-### Testing Kubectl
+### Testing kubectl
 ```
 kubectl version
 ```
@@ -122,7 +123,7 @@ kubectl version
 
 **Note:** Version and GitCommit might be different.
 
-## Install Minikube
+## Install minikube
 [Official minikude github](https://github.com/kubernetes/minikube/releases)
 #### Linux
 ```
@@ -151,13 +152,14 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
   - Debian-based Linux & Windows users should consider using the installer packages listed at the above URL
 ----
 
-## Basic Minikube Commands
+## Basic minikube commands
 - Start minikube
 ```
 minikube start
 ```
 ![](Documentation.assets/Documentation-f6951baf.png)
 
+<br />
 
 - Deploy a sample Kubernetes "deployment" to your local minikube
 ```
@@ -165,7 +167,7 @@ kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --por
 ```
 ![](Documentation.assets/Documentation-6bbac6d2.png)
 
-
+<br />
 
 - Expose this deployment to an external network
 ```
@@ -173,6 +175,7 @@ kubectl expose deployment hello-minikube --type=NodePort
 ```
 ![](Documentation.assets/Documentation-efa21f57.png)
 
+<br />
 
 - List the “pods” of this deployment
 ```
@@ -180,6 +183,7 @@ kubectl get pod
 ```
 ![](Documentation.assets/Documentation-0039803f.png)
 
+<br />
 
 - Access the sample service
 ```
@@ -187,6 +191,7 @@ curl $(minikube service hello-minikube --url)
 ```
 ![](Documentation.assets/Documentation-841fad36.png)
 
+<br />
 
 - Delete the deployment
 ```
@@ -194,6 +199,7 @@ kubectl delete deployment hello-minikube
 ```
 ![](Documentation.assets/Documentation-0249c9be.png)
 
+<br />
 
 - Stop minikube
 ```
