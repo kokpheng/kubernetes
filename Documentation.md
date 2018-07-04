@@ -27,20 +27,10 @@ read the CNCF [announcement].
 
 ----
 
-<p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#how-to-use">How To Use</a> •
-  <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
-  <a href="#license">License</a> •
-  <a href="#source-code">Source Code Example</a>
-</p>
-
 ## Table of Contents
 
 - [Environment](#environment)
-- [Setup Environment](#setup)
+- [Minikube](#minikube-overview)
   - []
 - [Usage](#usage)
 	- [Generator](#generator)
@@ -159,6 +149,7 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
   ```
   ![](Documentation.assets/Documentation-f6951baf.png)
 
+<br />
 
 - Deploy a sample Kubernetes "deployment" to your local minikube
   ```
@@ -207,37 +198,12 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
   ![](Documentation.assets/Documentation-8e2d4fce.png)
 
 
+## 📙 Source Code Example
+- [Download Code](https://github.com/jleetutorial/kubernetes-demo)
 
+## 💬 Contributing
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Usage
-
-TODO: Write usage instructions
-
-## Contributing
+Your contributions are always welcome! :tada:
 
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
@@ -245,17 +211,6 @@ TODO: Write usage instructions
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
-## History
+## 📜 License
 
-TODO: Write history
-
-## Credits
-
-TODO: Write credits
-
-## License
-
-TODO: Write license
-
-## Source Code Example
-[Code](https://github.com/jleetutorial/kubernetes-demo)
+The MIT License (MIT) 2018 - [Kokpheng Yin](https://github.com/yinkokpheng)
