@@ -158,7 +158,6 @@ minikube start
 ```
 ![](Documentation.assets/Documentation-f6951baf.png)
 
-<br />
 - Deploy a sample Kubernetes "deployment" to your local minikube
 ```
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
