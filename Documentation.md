@@ -35,6 +35,7 @@ read the CNCF [announcement].
   - [Install minikube](#install-minikube)
   - [Basic minikube commands](#basic-minikube-commands)
 - [Your First K8S App](#your-first-k8s-app)
+- [Basic kubectl commands](#basic-kubectl-commands)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -271,6 +272,92 @@ minikube service tomcat-deployment --url
 
 This will provide us with the URL including the port number that we can access or given expose service on. Copying this URL we will use curl to access our local service as you can see we will get the HTML of the default Apache Tomcat welcome page.
 ![](Documentation.assets/Documentation-4a2392ab.png)
+
+[(Back to top)](#-table-of-contents)
+
+## Basic kubectl commands
+The kubectl command is relatively important in managing Kubernetes. kubectl provides access to both local and remote clusters and is essentially the primary gateway to interacting with any Kubernetes cluster. Since it is the primary command line access tool it’s important to get it know it well.
+
+
+We'll go over the most common kubectl commands here.
+
+
+- The kubectl get pods command lists all pods in the namespace. Provides the pod name, how many instances of the pod are running & ready, its status, how many times they have restarted, and their age
+  ```
+  kubectl get pods
+  ```
+  ![](Documentation.assets/Documentation-c74bae24.png)
+
+<br />
+
+- kubectl describe pod [pod name], Describes detailed information about all pods or a specified pod (optional pod name argument)
+  ```
+  kubectl describe pod [pod name]
+  ```
+  ![](Documentation.assets/Documentation-9d548055.png)
+
+
+<br />
+
+- kubectl expose command: Exposes a port (TCP or UDP) for a given deployment, pod, external network, or other resource
+  ```
+  kubectl expose <type name> <identifier/name> [—port=external port] [—target-port=container-port [—type=service-type]
+  ```
+  ![](Documentation.assets/Documentation-cc5db30e.png)
+
+<br />
+
+- kubectl port-forward command: Forwards one or more local ports to a pod.
+  ```
+  kubectl port-forward <pod name> [LOCAL_PORT:]REMOTE_PORT]
+  ```
+  ![](Documentation.assets/Documentation-53d35fa4.png)
+
+<br />
+
+- kubectl attach command: Attaches to a process that is already running inside an existing container.
+  ```
+  kubectl attach <pod name> -c <container>
+  ```
+  ![](Documentation.assets/Documentation-9743cb2d.png)
+
+<br />
+
+- kubectl exec command:
+  - Execute a command in a container
+  - -i option will pass stdin to the container
+  - -t option will specify stdin is a TTY
+
+  ```
+  kubectl exec [-it] <pod name> [-c CONTAINER] — COMMAND [args...]
+  ```
+  ![](Documentation.assets/Documentation-2725c649.png)
+
+<br />
+
+- kubectl label pods command: Updates the labels on a resource
+  ```
+  kubectl label [—overwrite] <type> KEY_1=VAL_1 ....
+  ```
+  ![](Documentation.assets/Documentation-2e366737.png)
+
+<br />
+
+- kubectl run command: Run a particular image on the cluster
+  ```
+  kubectl run <name> —image=image
+  ```
+  ![](Documentation.assets/Documentation-b82f2c59.png)
+
+<br />
+
+#### Full Kubernetes references & Cheat Sheet
+- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
+
+
+
+
 
 [(Back to top)](#-table-of-contents)
 
