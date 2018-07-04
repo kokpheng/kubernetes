@@ -122,9 +122,36 @@ kubectl version
 
 **Note:** Version and GitCommit might be different.
 
+## Install Minikube
+[Official minikude github](https://github.com/kubernetes/minikube/releases)
+#### Linux
+```
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+```
+Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually.
+#### OS X
+```
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+```
+Feel free to leave off the `sudo mv minikube /usr/local/bin` if you would like to add minikube to your path manually.
 
+Or you can install via homebrew with `brew cask install minikube`
 
+#### Windows
+Use browser download link from releases [link](https://github.com/kubernetes/minikube/releases)
 
+###### Windows [Experimental]
+Download the `minikube-windows-amd64.exe` file, rename it to `minikube.exe` and add it to your path.
+
+###### Windows Installer [Experimental]
+
+Download the `minikube-installer.exe` file, and execute the installer. This will automatically add minikube.exe to your path with an uninstaller available as well.
+
+----
+- Latest installation instruction for macOS*, Linux, and Windows are always available online:
+  - "Minikube Releases" at the Minikube Github repository
+  - Debian-based Linux & Windows users should consider using the installer packages listed at the above URL
+----
 
 ## Usage
 
