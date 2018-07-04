@@ -158,41 +158,43 @@ minikube start
 ```
 ![](Documentation.assets/Documentation-f6951baf.png)
 
+
 - Deploy a sample Kubernetes "deployment" to your local minikube
 ```
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 ```
 ![](Documentation.assets/Documentation-6bbac6d2.png)
 
-<br />
+
+
 - Expose this deployment to an external network
 ```
 kubectl expose deployment hello-minikube --type=NodePort
 ```
 ![](Documentation.assets/Documentation-efa21f57.png)
 
-<br />
+
 - List the “pods” of this deployment
 ```
 kubectl get pod
 ```
 ![](Documentation.assets/Documentation-0039803f.png)
 
-<br />
+
 - Access the sample service
 ```
 curl $(minikube service hello-minikube --url)
 ```
 ![](Documentation.assets/Documentation-841fad36.png)
 
-<br />
+
 - Delete the deployment
 ```
 kubectl delete deployment hello-minikube
 ```
 ![](Documentation.assets/Documentation-0249c9be.png)
 
-<br />
+
 - Stop minikube
 ```
 minikube stop
