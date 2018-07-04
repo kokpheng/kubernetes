@@ -118,7 +118,7 @@ Use Explorer to move the kubectl binary to a directory in your path of your choi
 ```
 kubectl version
 ```
-![](Documentation.assets/Documentation-8fedcb11.png)
+![](Documentation.assets/Documentation-e3974b59.png)
 
 **Note:** Version and GitCommit might be different.
 
@@ -156,49 +156,49 @@ Download the `minikube-installer.exe` file, and execute the installer. This will
 ```
 minikube start
 ```
-![](Documentation.assets/Documentation-0c94eae9.png)
+![](Documentation.assets/Documentation-f6951baf.png)
 
-<br/>
+<br />
 - Deploy a sample Kubernetes “deployment” to your local minikube
 ```
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 ```
-![](Documentation.assets/Documentation-82459bc7.png)
+![](Documentation.assets/Documentation-6bbac6d2.png)
 
-<br/>
+<br />
 - Expose this deployment to an external network
 ```
 kubectl expose deployment hello-minikube --type=NodePort
 ```
-![](Documentation.assets/Documentation-9ca4bcc1.png)
+![](Documentation.assets/Documentation-efa21f57.png)
 
-<br/>
+<br />
 - List the “pods” of this deployment
 ```
 kubectl get pod
 ```
-![](Documentation.assets/Documentation-a6d7e9ca.png)
+![](Documentation.assets/Documentation-0039803f.png)
 
-<br/>
+<br />
 - Access the sample service
 ```
 curl $(minikube service hello-minikube --url)
 ```
-![](Documentation.assets/Documentation-8254ce69.png)
+![](Documentation.assets/Documentation-841fad36.png)
 
-<br/>
+<br />
 - Delete the deployment
 ```
 kubectl delete deployment hello-minikube
 ```
-![](Documentation.assets/Documentation-2ff58470.png)
+![](Documentation.assets/Documentation-0249c9be.png)
 
-<br/>
+<br />
 - Stop minikube
 ```
 minikube stop
 ```
-![](Documentation.assets/Documentation-e3aa6c6c.png)
+![](Documentation.assets/Documentation-8e2d4fce.png)
 
 
 
