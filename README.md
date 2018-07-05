@@ -1,37 +1,52 @@
-## Welcome to GitHub Pages
+<h1 align="center">
+  <br>
+  <a href="https://kubernetes.io/"><img src="https://avatars1.githubusercontent.com/u/13629408?s=400&v=4" alt="Markdownify" width="200"></a>
+  <br>
+  Kubernetes
+  <br>
+</h1>
 
-You can use the [editor on GitHub](https://github.com/yinkokpheng/Kubernetes/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+[![Submit Queue Widget]][Submit Queue] [![GoDoc Widget]][GoDoc] [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/569/badge)](https://bestpractices.coreinfrastructure.org/projects/569)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 🚩 Table of Contents
 
-### Markdown
+- [1. Introduction to Kubernetes](Introduction to Kubernetes.md)
+  - [Environment](Introduction to Kubernetes.md#environment)
+  - [Minikube](Introduction to Kubernetes.md#minikube-overview)
+    - [Install kubectl](Introduction to Kubernetes.md#install-kubectl)
+    - [Install minikube](Introduction to Kubernetes.md#install-minikube)
+    - [Basic minikube commands](Introduction to Kubernetes.md#basic-minikube-commands)
+  - [Your First K8S App](Introduction to Kubernetes.md#your-first-k8s-app)
+  - [Basic kubectl commands](Introduction to Kubernetes.md#basic-kubectl-commands)
+- [2. Basic and Core Concepts](Basic and Core Concepts.md)
+  - [Scaling Kubernetes](Basic and Core Concepts.md#scaling-kubernetes)
+  - [Kubernetes Deployment](Basic and Core Concepts.md#kubernetes-deployment)
+  - [Labels and Selectors](Basic and Core Concepts.md#labels-and-selectors)
+  - [Health Checks](Basic and Core Concepts.md#health-checks)
+  - [Web Interface](Basic and Core Concepts.md#web-interface)
+    - [Kubernetes Web UI](Basic and Core Concepts.md#kubernetes-web-ui)
+    - [Using The Web UI](Basic and Core Concepts.md#using-the-web-ui)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## 🔖 Full Kubernetes references & Cheat Sheet
+- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 
-```markdown
-Syntax highlighted code block
+## 💬 Contributing
 
-# Header 1
-## Header 2
-### Header 3
+Your contributions are always welcome! :tada:
 
-- Bulleted
-- List
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
 
-1. Numbered
-2. List
+## 📜 License
 
-**Bold** and _Italic_ and `Code` text
+The MIT License (MIT) 2018
+> GitHub [@yinkokpheng](https://github.com/yinkokpheng)
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/yinkokpheng/Kubernetes/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+[GoDoc]: https://godoc.org/k8s.io/kubernetes
+[GoDoc Widget]: https://godoc.org/k8s.io/kubernetes?status.svg
+[Submit Queue]: http://submit-queue.k8s.io/#/ci
+[Submit Queue Widget]: http://submit-queue.k8s.io/health.svg?v=1
