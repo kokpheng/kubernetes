@@ -43,7 +43,7 @@ read the CNCF [announcement].
 - [Web Interface](#web-interface)
   - [Kubernetes Web UI](#kubernetes-web-ui)
   - [Using The Web UI](#using-the-web-ui)
-- [References](#-full-kubernetes-references-&-cheat-sheet)
+- [References](#-full-kubernetes-references--cheat-sheet)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
