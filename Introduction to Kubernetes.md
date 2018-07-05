@@ -115,7 +115,7 @@ It depends on who you are & what you’re using it for
 ```
 kubectl version
 ```
-![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-e3974b59.png)
+![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-e3974b59.png)
 
 **Note:** Version and GitCommit might be different.
 
@@ -158,7 +158,7 @@ kubectl version
   ```
   minikube start
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-f6951baf.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-f6951baf.png)
 
 <br />
 
@@ -166,7 +166,7 @@ kubectl version
   ```
   kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-6bbac6d2.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-6bbac6d2.png)
 
 <br />
 
@@ -174,7 +174,7 @@ kubectl version
   ```
   kubectl expose deployment hello-minikube --type=NodePort
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-efa21f57.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-efa21f57.png)
 
 <br />
 
@@ -182,7 +182,7 @@ kubectl version
   ```
   kubectl get pod
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-0039803f.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-0039803f.png)
 
 <br />
 
@@ -190,7 +190,7 @@ kubectl version
   ```
   curl $(minikube service hello-minikube --url)
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-841fad36.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-841fad36.png)
 
 <br />
 
@@ -198,7 +198,7 @@ kubectl version
   ```
   kubectl delete deployment hello-minikube
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-0249c9be.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-0249c9be.png)
 
 <br />
 
@@ -206,7 +206,7 @@ kubectl version
   ```
   minikube stop
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-8e2d4fce.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-8e2d4fce.png)
 
 [(Back to top)](#-table-of-contents)
 
@@ -251,7 +251,7 @@ and apply it to our cluster.
 ```
 kubectl apply -f ./deployment.yaml
 ```
-![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-e0e0130b.png)
+![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-e0e0130b.png)
 
 You'll see that the deployment was successfully created.
 
@@ -261,7 +261,7 @@ You'll see that the deployment was successfully created.
 ```
 kubectl expose deployment tomcat-deployment --type=NodePort
 ```
-![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-b6c1f266.png)
+![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-b6c1f266.png)
 
 <br />
 
@@ -269,10 +269,10 @@ In order to find what port it was created on, we’ll use the minikupe service w
 ```
 minikube service tomcat-deployment --url
 ```
-![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-90405042.png)
+![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-90405042.png)
 
 This will provide us with the URL including the port number that we can access or given expose service on. Copying this URL we will use curl to access our local service as you can see we will get the HTML of the default Apache Tomcat welcome page.
-![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-4a2392ab.png)
+![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-4a2392ab.png)
 
 [(Back to top)](#-table-of-contents)
 
@@ -285,7 +285,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl get pods
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-c74bae24.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-c74bae24.png)
 
 <br />
 
@@ -293,7 +293,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl describe pod [pod name]
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-9d548055.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-9d548055.png)
 
 
 <br />
@@ -302,7 +302,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl expose <type name> <identifier/name> [—port=external port] [—target-port=container-port [—type=service-type]
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-cc5db30e.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-cc5db30e.png)
 
 <br />
 
@@ -310,7 +310,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl port-forward <pod name> [LOCAL_PORT:]REMOTE_PORT]
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-53d35fa4.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-53d35fa4.png)
 
 <br />
 
@@ -318,7 +318,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl attach <pod name> -c <container>
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-9743cb2d.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-9743cb2d.png)
 
 <br />
 
@@ -330,7 +330,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl exec [-it] <pod name> [-c CONTAINER] — COMMAND [args...]
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-2725c649.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-2725c649.png)
 
 <br />
 
@@ -338,7 +338,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl label [—overwrite] <type> KEY_1=VAL_1 ....
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-2e366737.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-2e366737.png)
 
 <br />
 
@@ -346,7 +346,7 @@ We'll go over the most common kubectl commands here.
   ```
   kubectl run <name> —image=image
   ```
-  ![](Assets/Introduction to Kubernetes.assets/Introduction to Kubernetes-b82f2c59.png)
+  ![](Assets/Introduction%20to%20Kubernetes.assets/Introduction%20to%20Kubernetes-b82f2c59.png)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
