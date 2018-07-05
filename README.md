@@ -10,7 +10,7 @@
 
 ## 🚩 Table of Contents
 
-- [1. Introduction to Kubernetes](Introduction%20to%20Kubernetes.md)
+1. [Introduction to Kubernetes](Introduction%20to%20Kubernetes.md)
   - [Environment](Introduction%20to%20Kubernetes.md#environment)
   - [Minikube](Introduction%20to%20Kubernetes.md#minikube-overview)
     - [Install kubectl](Introduction%20to%20Kubernetes.md#install-kubectl)
@@ -18,7 +18,7 @@
     - [Basic minikube commands](Introduction%20to%20Kubernetes.md#basic-minikube-commands)
   - [Your First K8S App](Introduction%20to%20Kubernetes.md#your-first-k8s-app)
   - [Basic kubectl commands](Introduction%20to%20Kubernetes.md#basic-kubectl-commands)
-- [2. Basic and Core Concepts](Basic%20and%20Core%20Concepts.md)
+2. [Basic and Core Concepts](Basic%20and%20Core%20Concepts.md)
   - [Scaling Kubernetes](Basic%20and%20Core%20Concepts.md#scaling-kubernetes)
   - [Kubernetes Deployment](Basic%20and%20Core%20Concepts.md#kubernetes-deployment)
   - [Labels and Selectors](Basic%20and%20Core%20Concepts.md#labels-and-selectors)
