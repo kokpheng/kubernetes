@@ -38,6 +38,7 @@ read the CNCF [announcement].
 - [Basic kubectl commands](#basic-kubectl-commands)
 - [Scaling Kubernetes](#scaling-kubernetes)
 - [Kubernetes Deployment](#kubernetes-deployment)
+- [Labels and Selectors](#labels-and-selectors)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -424,6 +425,91 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ![](Documentation.assets/Documentation-689435aa.png)
 
 <br />
+
+## Labels and Selectors
+
+A method to keep things organized, and to help you (a human) and Kubernetes (a machine)
+identify resources to act upon.
+- Labels are key/value pairs that you can attach to objects like pods
+  - They are for users to help describe meaningful and relevant information about an object
+  - They do not affect the semantics of the core system
+- Selectors are a way of expressing how to select objects based on their labels
+  - Selectors are a simple language to define what labels match and which ones done
+  - You can specify if a label equals a given criteria or if it fits inside a set of criteria
+    - Equality-based
+    - Set-based
+- You can label nearly anything in the Kubernetes world
+  - Deployments
+  - Services
+  - Nodes
+- Let’s use labels to label a node that it has SSD storage and then use a selector to tell the deployment that our app should only ever go onto a node with SSD storage.
+
+- For this example we’re going to use “nodeSelector”
+- nodeSelector is a property on a deployment that uses labels and selectors to choose which nodes the master decides to run a given pod on
+- To accomplish our goal of running our deployment only on nodes with SSD we will:
+  - Label a node as having an SSD
+  - Define the nodeSelector on our deployment to match only nodes having
+the label we just defined
+
+##### 1. Apply label to nodes
+- Get nodes
+```
+kubectl get nodes
+```
+![](Documentation.assets/Documentation-b8e09c5e.png)
+
+<br />
+
+- Label node
+```
+kubectl label node minikube storageType=ssd
+```
+![](Documentation.assets/Documentation-dcafc1c7.png)
+
+<br />
+
+- See detail of node
+```
+kubectl describe node minikube
+```
+![](Documentation.assets/Documentation-76fd087e.png)
+
+<br />
+
+##### 2. Apply nodeSelector to deployment
+
+[deployment.yaml](Source%20Code/Basic%20and%20Core%20Concepts/Labels%20%26%20Selectors/deployment.yaml)
+  ```yaml
+  apiVersion: apps/v1beta2
+  kind: Deployment
+  metadata:
+    name: tomcat-deployment
+  spec:
+    selector:
+      matchLabels:
+        app: tomcat
+    replicas: 4
+    template:
+      metadata:
+        labels:
+          app: tomcat
+      spec:
+        containers:
+        - name: tomcat
+          image: tomcat:9.0
+          ports:
+          - containerPort: 8080
+        nodeSelector:
+          storageType: ssd
+  ```
+![](Documentation.assets/Documentation-c7c08541.png)
+
+Apply the new updated the deployment.yaml file on to Kubernetes cluster. Using the kubectl apply command, allows you to apply changes to the deployment that may not be possible using a variety of Kubectl commands.
+
+For example node selector must be done in the deployment file. Kubernetes is smart enough to understand what changes need to be applied and what is different from the new application of the deployment from the existing one. With this change applied Kubernetes will only deploy Tomcat to nodes that have been labeled with the storage type equaling SSD.
+
+<br />
+
 
 
 
