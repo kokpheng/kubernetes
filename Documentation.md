@@ -36,6 +36,7 @@ read the CNCF [announcement].
   - [Basic minikube commands](#basic-minikube-commands)
 - [Your First K8S App](#your-first-k8s-app)
 - [Basic kubectl commands](#basic-kubectl-commands)
+- [Scaling Kubernetes](#scaling-kubernetes)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -355,9 +356,38 @@ We'll go over the most common kubectl commands here.
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
 - kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 
+## Scaling Kubernetes
+We continue from [Your First K8S App](#your-first-k8s-app). Replication is an important cornerstone of Kubernetes. Kubernetes supports scaling through replicating pods on the same or multiple nodes. We can define how these replica are built in deployment.yaml or using `kubectl scale` command to scale our existing deployment.
 
+Here is the pod from previous [Your First K8S App](#your-first-k8s-app).
+![](Documentation.assets/Documentation-65260b36.png)
 
+let's scale our deployment by the following command. We will scale tomcat-deployment to 4 replicas.
 
+- kubectl scale command
+  ```
+  kubectl scale -—replicas=4 deployment/tomcat-deployment
+  ```
+![](Documentation.assets/Documentation-1c32256f.png)
+
+Now, we have scaled the deployment. Next we will expose pod to outside world. Previously, we defined a "NodePort" service for the Tomcat pod
+```
+kubectl expose deployment tomcat-deployment --type=NodePort
+```
+- kubectl expose command.
+
+  let’s define a LoadBalancer service, instead
+  ```
+  kubectl expose deployment tomcat-deployment --type=LoadBalancer --port=8080 --target-port=8080 --name=tomcat-load-balancer
+  ```
+  ![](Documentation.assets/Documentation-4df003c0.png)
+
+  let’s see what IP address was assigned for the service
+  ```
+  kubectl describe services tomcat-load-balancer
+  ```
+  ![](Documentation.assets/Documentation-c8067b53.png)
+  As you can see it’s  assigned an internal IP `10.98.74.204`
 
 [(Back to top)](#-table-of-contents)
 
