@@ -39,6 +39,7 @@ read the CNCF [announcement].
 - [Scaling Kubernetes](#scaling-kubernetes)
 - [Kubernetes Deployment](#kubernetes-deployment)
 - [Labels and Selectors](#labels-and-selectors)
+- [Health Checks](#health-checks)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -180,7 +181,7 @@ kubectl version
 
 <br />
 
-- List the “pods” of this deployment
+- List the "pods" of this deployment
   ```
   kubectl get pod
   ```
@@ -444,7 +445,7 @@ identify resources to act upon.
   - Nodes
 - Let’s use labels to label a node that it has SSD storage and then use a selector to tell the deployment that our app should only ever go onto a node with SSD storage.
 
-- For this example we’re going to use “nodeSelector”
+- For this example we’re going to use "nodeSelector"
 - nodeSelector is a property on a deployment that uses labels and selectors to choose which nodes the master decides to run a given pod on
 - To accomplish our goal of running our deployment only on nodes with SSD we will:
   - Label a node as having an SSD
@@ -478,7 +479,7 @@ kubectl describe node minikube
 
 ##### 2. Apply nodeSelector to deployment
 
-[deployment.yaml](Source%20Code/Basic%20and%20Core%20Concepts/Labels%20%26%20Selectors/deployment.yaml)
+[deployment.yaml](Source%20Code/Basic%20and%20Core%20Concepts/Labels%20%26%20Selectors/deployment.yaml). We added `nodeSelector` and `sotrageType` in this file.
   ```yaml
   apiVersion: apps/v1beta2
   kind: Deployment
@@ -510,11 +511,61 @@ For example node selector must be done in the deployment file. Kubernetes is sma
 
 <br />
 
+## Health Checks
 
+Kubernetes has two types of health checks to ascertain two different
+things
+- Readiness Probes: To determine when a Pod is "ready" (e.g. after it has started to see when it’s ready and has loaded what it needs to internally in the image and is ready to take requests from external services)
+- Liveness Probes: To determine when a Pod is "healthy" or "unhealthy" after it has become ready
 
+#### A healthy Tomcat example
+What we will check:
+- A Readiness Probe will check to make sure the Pod has started and is ready to begin taking requests
+- A Liveness Probe on the Tomcat deployment will help us ensure the containers continue to be able to accept and service requests without error in a reasonable amount of time
 
+[deployment.yaml](Source%20Code/Basic%20and%20Core%20Concepts/Health%20Checks/deployment.yaml). We added `livenessProbe` and `readinessProbe` in this file.
+```yaml
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: tomcat-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tomcat
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: tomcat
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat:9.0
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+```
+![](Documentation.assets/Documentation-46f38535.png)
 
+You’ll notice a few differences in a few of properties within each one that’s because we need them to different things.
 
+Remember the `readiness probe` at the bottom of the file is our way of telling Kubernetes how to test to make sure that when it starts to pod that it is ready for work. In this case we'll tell it to access `port 8080` every `3 seconds` after initial delay of `15 seconds` on simply the `/` directory once the succeeds, Kubernetes will know the pod is ready for business.
+
+After that it’ll go to `liveness probe`. Every `30 seconds` after initial delay of `30 seconds` it will use HTTP to access `port 8080` on the `/` path if the HTTP request fails, it’ll deem the pod to be unhealthy. If the HTTP request succeeds it's deemed to be healthy.
+
+![](Documentation.assets/Documentation-7109ff50.png)
 
 ## 📙 Source Code Example
 - You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
