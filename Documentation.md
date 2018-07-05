@@ -43,6 +43,7 @@ read the CNCF [announcement].
 - [Web Interface](#web-interface)
   - [Kubernetes Web UI](#kubernetes-web-ui)
   - [Using The Web UI](#using-the-web-ui)
+- [References](#-full-kubernetes-references-&-cheat-sheet)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -357,10 +358,6 @@ We'll go over the most common kubectl commands here.
 
 <br />
 
-#### Full Kubernetes references & Cheat Sheet
-- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
-- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
-
 ## Scaling Kubernetes
 We continue from [Your First K8S App](#your-first-k8s-app). Replication is an important cornerstone of Kubernetes. Kubernetes supports scaling through replicating pods on the same or multiple nodes. We can define how these replica are built in deployment.yaml or using `kubectl scale` command to scale our existing deployment.
 
@@ -608,7 +605,9 @@ kubectl proxy
 
 
 
-
+## 🔖 Full Kubernetes references & Cheat Sheet
+- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
 
 
 ## 📙 Source Code Example
