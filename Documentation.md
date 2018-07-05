@@ -37,6 +37,7 @@ read the CNCF [announcement].
 - [Your First K8S App](#your-first-k8s-app)
 - [Basic kubectl commands](#basic-kubectl-commands)
 - [Scaling Kubernetes](#scaling-kubernetes)
+- [Kubernetes Deployment](#kubernetes-deployment)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -390,6 +391,44 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   As you can see it’s  assigned an internal IP `10.98.74.204`
 
 [(Back to top)](#-table-of-contents)
+
+## Kubernetes Deployments
+- List deployments
+  ```
+  kubectl get deployments
+  ```
+  ![](Documentation.assets/Documentation-13e4dd5c.png)
+
+<br />
+
+- View status of deployment roll outs
+  ```
+  kubectl rollout status
+  ```
+![](Documentation.assets/Documentation-5803ae4c.png)
+
+<br />
+
+- Set the image of a deployment
+  ```
+  kubectl set image
+  ```
+  ![](Documentation.assets/Documentation-2ef2ca23.png)
+
+<br />
+
+- View the history of a rollout, including previous revisions
+  ```
+  kubectl rollout history
+  ```
+  ![](Documentation.assets/Documentation-689435aa.png)
+
+<br />
+
+
+
+
+
 
 ## 📙 Source Code Example
 - You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
