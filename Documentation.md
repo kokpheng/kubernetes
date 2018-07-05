@@ -40,10 +40,12 @@ read the CNCF [announcement].
 - [Kubernetes Deployment](#kubernetes-deployment)
 - [Labels and Selectors](#labels-and-selectors)
 - [Health Checks](#health-checks)
+- [Web Interface](#web-interface)
+  - [Kubernetes Web UI](#kubernetes-web-ui)
+  - [Using The Web UI](#using-the-web-ui)
 - [Source Code Example](#-source-code-example)
 - [Contributing](#-contributing)
 - [License](#-license)
-
 
 ## Environment
 It depends on who you are & what you’re using it for
@@ -566,6 +568,48 @@ Remember the `readiness probe` at the bottom of the file is our way of telling K
 After that it’ll go to `liveness probe`. Every `30 seconds` after initial delay of `30 seconds` it will use HTTP to access `port 8080` on the `/` path if the HTTP request fails, it’ll deem the pod to be unhealthy. If the HTTP request succeeds it's deemed to be healthy.
 
 ![](Documentation.assets/Documentation-7109ff50.png)
+
+<br />
+
+## Web Interface
+Up to this point our primary point of contact with Kubernetes has been the Kubectl command line interface. Kubectl continues to be the dominant tool and will be for the remainder of lectures.
+
+However in some situations a web interface is equally useful. Kubernetes provides a web user interface called the dashboard that we can use to access the same information that Kubectl can present in a friendly point and click web interface. It’s called the Dashboard UI.
+
+It runs on your Kubernetes Masters and is accessible directly if you have a direct connection to your cluster or to your Masters. This is unlikely in production situations, however Kubectl is your friend. Kubectl can create a proxy or a tunnel for you from your local workstation to a Kubernetes cluster that you may not direct network access to. Using the Kubectl proxy command.
+
+#### Kubernetes Web UI
+
+![](Documentation.assets/Documentation-db15ddf0.png)
+- Provides a variety of views for nearly anything in your Kubernetes cluster
+- Allows update, deletion, and creation of nearly anything in your Kubernetes cluster
+- Accesses the same APIs as kubectl
+
+#### Using The Web UI
+
+- On some Kubernetes clusters the Dashboard UI is pre-installed, on
+some it is not (many cloud providers’ Kubernetes services include it)
+- Installing the Dashboard, The Dashboard UI is not deployed by default. To deploy it, run the following command:
+```
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+```
+- Accessing the dashboard (the most fool-proof way)
+```
+kubectl proxy
+```
+![](Documentation.assets/Documentation-6364d451.png)
+
+- Navigate in your web browser
+  - http://localhost:8001/ui
+  - http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard:/proxy/
+  
+![](Documentation.assets/Documentation-1813412f.png)
+
+
+
+
+
+
 
 ## 📙 Source Code Example
 - You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
