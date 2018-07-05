@@ -26,7 +26,7 @@
 We continue from [Your First K8S App](#your-first-k8s-app). Replication is an important cornerstone of Kubernetes. Kubernetes supports scaling through replicating pods on the same or multiple nodes. We can define how these replica are built in deployment.yaml or using `kubectl scale` command to scale our existing deployment.
 
 Here is the pod from previous [Your First K8S App](#your-first-k8s-app).
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-65260b36.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-65260b36.png)
 
 let's scale our deployment by the following command. We will scale tomcat-deployment to 4 replicas.
 
@@ -34,7 +34,7 @@ let's scale our deployment by the following command. We will scale tomcat-deploy
   ```
   kubectl scale -—replicas=4 deployment/tomcat-deployment
   ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-1c32256f.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-1c32256f.png)
 
 Now, we have scaled the deployment. Next we will expose pod to outside world. Previously, we defined a "NodePort" service for the Tomcat pod
 ```
@@ -46,13 +46,13 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ```
   kubectl expose deployment tomcat-deployment --type=LoadBalancer --port=8080 --target-port=8080 --name=tomcat-load-balancer
   ```
-  ![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-4df003c0.png)
+  ![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-4df003c0.png)
 
   let’s see what IP address was assigned for the service
   ```
   kubectl describe services tomcat-load-balancer
   ```
-  ![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-c8067b53.png)
+  ![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-c8067b53.png)
   As you can see it’s  assigned an internal IP `10.98.74.204`
 
 [(Back to top)](#-table-of-contents)
@@ -62,7 +62,7 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ```
   kubectl get deployments
   ```
-  ![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-13e4dd5c.png)
+  ![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-13e4dd5c.png)
 
 <br />
 
@@ -70,7 +70,7 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ```
   kubectl rollout status
   ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-5803ae4c.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-5803ae4c.png)
 
 <br />
 
@@ -78,7 +78,7 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ```
   kubectl set image
   ```
-  ![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-2ef2ca23.png)
+  ![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-2ef2ca23.png)
 
 <br />
 
@@ -86,7 +86,7 @@ kubectl expose deployment tomcat-deployment --type=NodePort
   ```
   kubectl rollout history
   ```
-  ![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-689435aa.png)
+  ![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-689435aa.png)
 
 <br />
 
@@ -120,7 +120,7 @@ the label we just defined
 ```
 kubectl get nodes
 ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-b8e09c5e.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-b8e09c5e.png)
 
 <br />
 
@@ -128,7 +128,7 @@ kubectl get nodes
 ```
 kubectl label node minikube storageType=ssd
 ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-dcafc1c7.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-dcafc1c7.png)
 
 <br />
 
@@ -136,7 +136,7 @@ kubectl label node minikube storageType=ssd
 ```
 kubectl describe node minikube
 ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-76fd087e.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-76fd087e.png)
 
 <br />
 
@@ -166,7 +166,7 @@ kubectl describe node minikube
         nodeSelector:
           storageType: ssd
   ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-c7c08541.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-c7c08541.png)
 
 Apply the new updated the deployment.yaml file on to Kubernetes cluster. Using the kubectl apply command, allows you to apply changes to the deployment that may not be possible using a variety of Kubectl commands.
 
@@ -220,7 +220,7 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 3
 ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-46f38535.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-46f38535.png)
 
 You’ll notice a few differences in a few of properties within each one that’s because we need them to different things.
 
@@ -228,7 +228,7 @@ Remember the `readiness probe` at the bottom of the file is our way of telling K
 
 After that it’ll go to `liveness probe`. Every `30 seconds` after initial delay of `30 seconds` it will use HTTP to access `port 8080` on the `/` path if the HTTP request fails, it’ll deem the pod to be unhealthy. If the HTTP request succeeds it's deemed to be healthy.
 
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-7109ff50.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-7109ff50.png)
 
 <br />
 
@@ -241,7 +241,7 @@ It runs on your Kubernetes Masters and is accessible directly if you have a dire
 
 #### Kubernetes Web UI
 
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-db15ddf0.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-db15ddf0.png)
 - Provides a variety of views for nearly anything in your Kubernetes cluster
 - Allows update, deletion, and creation of nearly anything in your Kubernetes cluster
 - Accesses the same APIs as kubectl
@@ -258,13 +258,13 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/
 ```
 kubectl proxy
 ```
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-6364d451.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-6364d451.png)
 
 - Navigate in your web browser
   - http://localhost:8001/ui
   - http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard:/proxy/
 
-![](Assets/Basic and Core Concepts.assets/Basic and Core Concepts-1813412f.png)
+![](Assets/Basic%20and%20Core%20Concepts.assets/Basic%20and%20Core%20Concepts-1813412f.png)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands

@@ -10,22 +10,22 @@
 
 ## 🚩 Table of Contents
 
-- [1. Introduction to Kubernetes](Introduction to Kubernetes.md)
-  - [Environment](Introduction to Kubernetes.md#environment)
-  - [Minikube](Introduction to Kubernetes.md#minikube-overview)
-    - [Install kubectl](Introduction to Kubernetes.md#install-kubectl)
-    - [Install minikube](Introduction to Kubernetes.md#install-minikube)
-    - [Basic minikube commands](Introduction to Kubernetes.md#basic-minikube-commands)
-  - [Your First K8S App](Introduction to Kubernetes.md#your-first-k8s-app)
-  - [Basic kubectl commands](Introduction to Kubernetes.md#basic-kubectl-commands)
-- [2. Basic and Core Concepts](Basic and Core Concepts.md)
-  - [Scaling Kubernetes](Basic and Core Concepts.md#scaling-kubernetes)
-  - [Kubernetes Deployment](Basic and Core Concepts.md#kubernetes-deployment)
-  - [Labels and Selectors](Basic and Core Concepts.md#labels-and-selectors)
-  - [Health Checks](Basic and Core Concepts.md#health-checks)
-  - [Web Interface](Basic and Core Concepts.md#web-interface)
-    - [Kubernetes Web UI](Basic and Core Concepts.md#kubernetes-web-ui)
-    - [Using The Web UI](Basic and Core Concepts.md#using-the-web-ui)
+- [1. Introduction to Kubernetes](Introduction%20to%20Kubernetes.md)
+  - [Environment](Introduction%20to%20Kubernetes.md#environment)
+  - [Minikube](Introduction%20to%20Kubernetes.md#minikube-overview)
+    - [Install kubectl](Introduction%20to%20Kubernetes.md#install-kubectl)
+    - [Install minikube](Introduction%20to%20Kubernetes.md#install-minikube)
+    - [Basic minikube commands](Introduction%20to%20Kubernetes.md#basic-minikube-commands)
+  - [Your First K8S App](Introduction%20to%20Kubernetes.md#your-first-k8s-app)
+  - [Basic kubectl commands](Introduction%20to%20Kubernetes.md#basic-kubectl-commands)
+- [2. Basic and Core Concepts](Basic%20and%20Core%20Concepts.md)
+  - [Scaling Kubernetes](Basic%20and%20Core%20Concepts.md#scaling-kubernetes)
+  - [Kubernetes Deployment](Basic%20and%20Core%20Concepts.md#kubernetes-deployment)
+  - [Labels and Selectors](Basic%20and%20Core%20Concepts.md#labels-and-selectors)
+  - [Health Checks](Basic%20and%20Core%20Concepts.md#health-checks)
+  - [Web Interface](Basic%20and%20Core%20Concepts.md#web-interface)
+    - [Kubernetes Web UI](Basic%20and%20Core%20Concepts.md#kubernetes-web-ui)
+    - [Using The Web UI](Basic%20and%20Core%20Concepts.md#using-the-web-ui)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
