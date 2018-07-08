@@ -23,7 +23,7 @@
 ## Practical Example
 - Setting up a blog using a system called WordPress (a very popular blog/website management system)
 - WordPress uses a database called MySQL to store its information to host the website, blog posts, and other content the website may have
-![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-eebd5bdf.png)
+![](Andvanced%20-%20DNS%20and%20Service%20Discovery.assets/Andvanced%20-%20DNS%20and%20Service%20Discovery-eebd5bdf.png)
 
 #### MySQL
 - We’ll deploy MySQL in a deployment named "wordpress-mysql"
@@ -65,7 +65,7 @@ Now let’s use the `kubectl create –f` command to point to the MySQL-deployme
 ```
 kubectl create -f mysql-deployment.yaml
 ```
-![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-785c3b25.png)
+![](Andvanced%20-%20DNS%20and%20Service%20Discovery.assets/Andvanced%20-%20DNS%20and%20Service%20Discovery-785c3b25.png)
 
 Now that MySQL is running let’s deploy WordPress.
 
@@ -152,7 +152,7 @@ ports:
 
 Let’s use the `kubectl create –f` command and point it at the wordpress-deployment.yaml file.
 
-![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-b9e7902f.png)
+![](Andvanced%20-%20DNS%20and%20Service%20Discovery.assets/Andvanced%20-%20DNS%20and%20Service%20Discovery-b9e7902f.png)
 
 **Note** Remember since you're running but a minikube and not on an actual Kubernetes cluster on a cloud provider, which provides services like loadbalancers, we don’t actually have a load balancer. This is because minikube doesn’t provide this facility, instead minikube, for testing purposes, simply makes your load balancer function on a random port on your machine.
 
@@ -160,13 +160,13 @@ You can use minikube to retrieve the URL at which this load balancer is listenin
 ```
 minikube service wordpress --url
 ```
-![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-1ae0446f.png)
+![](Andvanced%20-%20DNS%20and%20Service%20Discovery.assets/Andvanced%20-%20DNS%20and%20Service%20Discovery-1ae0446f.png)
 
 The `minikube service wordpress --url` command will provide us with the URL at which the service is available because minikube doesn’t provide a load balancer. This just connects you to directly to the open port on the container.
 
 Let’s copy this URL to our clipboard. Then going into web browser, let’s navigate this URL. You’ll notice WordPress is ready for us to continue our installation through it's GUI interface. At this point WordPress has connected to my SQL and is properly running on our Kubernetes cluster. You can walk through the installation process as you would any other WordPress installation.
 
-![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-af7fcbcc.png)
+![](Andvanced%20-%20DNS%20and%20Service%20Discovery.assets/Andvanced%20-%20DNS%20and%20Service%20Discovery-af7fcbcc.png)
 
 We've used DNS to connect two different services, developed, maintained and deployed completely separately to connect them in a maintainable and understandable way. Using the DNS service discovery, these services have now created a software stack that allows WordPress to run on top of MySQL and provide content management and deployment services.
 
