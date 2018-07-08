@@ -1,0 +1,201 @@
+<h1 align="center">
+  <br>
+  <a href="https://kubernetes.io/"><img src="https://avatars1.githubusercontent.com/u/13629408?s=400&v=4" alt="Markdownify" width="200"></a>
+  <br>
+  Kubernetes
+  <br>
+</h1>
+
+[![Submit Queue Widget]][Submit Queue] [![GoDoc Widget]][GoDoc] [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/569/badge)](https://bestpractices.coreinfrastructure.org/projects/569)
+
+## 🚩 Table of Contents
+
+- [Practical Example](#practical-example)
+  - [MySQL](#mysql)
+  - [WordPress](#wordpress)
+- [Deploy MySQL](#deploy-mysql)
+- [Deploy WordPress](#deploy-wordpress)
+- [References](#-full-kubernetes-references--cheat-sheet)
+- [Source Code Example](#-source-code-example)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+## Practical Example
+- Setting up a blog using a system called WordPress (a very popular blog/website management system)
+- WordPress uses a database called MySQL to store its information to host the website, blog posts, and other content the website may have
+![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-eebd5bdf.png)
+
+#### MySQL
+- We’ll deploy MySQL in a deployment named "wordpress-mysql"
+- Once deployed, it will run MySQL 5.6 on port 3306 on the wordpress-mysql hostname
+
+#### WordPress
+- We’ll deploy WordPress named as "wordpress"
+- We’ll configure MySQL to be available on the "wordpress-mysql" hostname and tell Wordpress to expect it there
+
+## Deploy MySQL
+We'll use the [mysql-deployment.yaml](Source%20Code/Advanced%20Kubernetes%20Usage/DNS%20and%20Service%20Discovery/mysql-deployment.yaml) file to establish two objects.
+
+First we'll declare a service named wordpress-mysql that exposes a service on port 3306.
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress
+    tier: mysql
+clusterIP: None
+```
+Secondly we'll define a pod in this deployment also called wordpress-mysql. We will use the MySQL Docker container version 5.6. This is maintained by the MySQL open source project.
+
+We will use their default configuration and will specify the MYSQL  root password.
+```yaml
+- name: MYSQL_ROOT_PASSWORD
+  value: PASSWORDS_IN_PLAIN_TEXT_ARE_BAD_WE_WILL_SHOW_SOMETHING_MORE_SECURE_LATER
+```
+This environment variable is defined by the MySQL Docker container and we’ll set the password to be  `PASSWORDS_IN_PLAIN_TEXT_ARE_BAD_WE_WILL_SHOW_SOMETHING_MORE_SECURE_LATER`. You’ll also notice that we’ve defined the container port of 3306. The Docker container is listening on port the 3306 for the running MySQL instance. This as we mentioned is the default behavior of MySQL. Since we've defined the service above this will be exposed to anyone connecting to the WordPress–MySQL service into the container running MySQL.
+
+Now let’s use the `kubectl create –f` command to point to the MySQL-deployment.yaml file.
+```
+kubectl create -f mysql-deployment.yaml
+```
+![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-785c3b25.png)
+
+Now that MySQL is running let’s deploy WordPress.
+
+## Deploy WordPress
+
+Now let’s have a look at the [wordpress-deployment.yaml](Source%20Code/Advanced%20Kubernetes%20Usage/DNS%20and%20Service%20Discovery/wordpress-deployment.yaml) file. Similar to MySQL it declares two objects, a loadbalancer and a deployment with a pod.
+
+Let’s have a look at service it deploys first. You'll notice the services name `wordpress` runs on `port 80` as you may know the default port of HTTP, the language of the web.
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: wordpress
+    tier: frontend
+  type: LoadBalancer
+```
+
+However it deploys a type load balancer. This is important to know. Despite the two important differences over a regular service. If you don’t specify load balancer, this service is only available inside the Kubernetes cluster by default. The IP address is chosen largely at random in the available IP space. When you specify load balancer however Kubernetes uses an external load-balancing service. The important aspect to know is that a load balancer uses an external load balancing service with a public and usually static IP address although that varies by provider and connects it to the service on your deployment.
+
+
+Let’s look at that now. we’ll use the WordPress 4.8 image. Again maintained by the WordPress open source project run by Automatic.
+
+```yaml
+apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+      - image: wordpress:4.8-apache
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql
+        - name: WORDPRESS_DB_PASSWORD
+          value: PASSWORDS_IN_PLAIN_TEXT_ARE_BAD_WE_WILL_SHOW_SOMETHING_MORE_SECURE_LATER
+        ports:
+        - containerPort: 80
+          name: wordpress
+```
+A couple of variables are defined like the database host `WORDPRESS_DB_HOST`. This is where the magic of DNS allows us to loosely coupled services and provides Service discovery. The value `wordpress-mysql`.
+
+We’ll also define the `WORDPRESS_DB_PASSWORD`. This was the password, which we set in the MySQL configuration.
+
+```yaml
+env:
+- name: WORDPRESS_DB_HOST
+  value: wordpress-mysql
+- name: WORDPRESS_DB_PASSWORD
+  value: PASSWORDS_IN_PLAIN_TEXT_ARE_BAD_WE_WILL_SHOW_SOMETHING_MORE_SECURE_LATER
+ports:
+- containerPort: 80
+  name: wordpress
+```
+
+Finally you’ll notice that it exposes `port 80`. `Port 80` is what the WordPress process inside the container is running on. Again this is the default behavior defined by the creators and maintainers of the WordPress project this will be wired up to port 80 on the load balancer. So we can access our WordPress service externally from outside our Kubernetes cluster.
+
+```yaml
+ports:
+- containerPort: 80
+  name: wordpress
+```
+
+Let’s use the `kubectl create –f` command and point it at the wordpress-deployment.yaml file.
+
+![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-b9e7902f.png)
+
+**Note** Remember since you're running but a minikube and not on an actual Kubernetes cluster on a cloud provider, which provides services like loadbalancers, we don’t actually have a load balancer. This is because minikube doesn’t provide this facility, instead minikube, for testing purposes, simply makes your load balancer function on a random port on your machine.
+
+You can use minikube to retrieve the URL at which this load balancer is listening.
+```
+minikube service wordpress --url
+```
+![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-1ae0446f.png)
+
+The `minikube service wordpress --url` command will provide us with the URL at which the service is available because minikube doesn’t provide a load balancer. This just connects you to directly to the open port on the container.
+
+Let’s copy this URL to our clipboard. Then going into web browser, let’s navigate this URL. You’ll notice WordPress is ready for us to continue our installation through it's GUI interface. At this point WordPress has connected to my SQL and is properly running on our Kubernetes cluster. You can walk through the installation process as you would any other WordPress installation.
+
+![](Andvanced - DNS and Service Discovery.assets/Andvanced - DNS and Service Discovery-af7fcbcc.png)
+
+We've used DNS to connect two different services, developed, maintained and deployed completely separately to connect them in a maintainable and understandable way. Using the DNS service discovery, these services have now created a software stack that allows WordPress to run on top of MySQL and provide content management and deployment services.
+
+## 🔖 Full Kubernetes references & Cheat Sheet
+- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
+
+
+## 📙 Source Code Example
+- You can download latest code from [here](https://github.com/yinkokpheng/Kubernetes/tree/master/Source%20Code).
+
+[(Back to top)](#-table-of-contents)
+
+## 💬 Contributing
+
+Your contributions are always welcome! :tada:
+
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
+
+## 📜 License
+
+The MIT License (MIT) 2018
+> GitHub [@yinkokpheng](https://github.com/yinkokpheng)
+
+[GoDoc]: https://godoc.org/k8s.io/kubernetes
+[GoDoc Widget]: https://godoc.org/k8s.io/kubernetes?status.svg
+[Submit Queue]: http://submit-queue.k8s.io/#/ci
+[Submit Queue Widget]: http://submit-queue.k8s.io/health.svg?v=1
