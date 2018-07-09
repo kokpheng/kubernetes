@@ -26,7 +26,7 @@
   - [Web Interface](2.Basic%20and%20Core%20Concepts.md#web-interface)
     - [Kubernetes Web UI](2.Basic%20and%20Core%20Concepts.md#kubernetes-web-ui)
     - [Using The Web UI](2.Basic%20and%20Core%20Concepts.md#using-the-web-ui)
-- [3.Andvanced - DNS and Service Discovery](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md)
+- [3.Advanced - DNS and Service Discovery](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md)
     - [Practical Example](A3.dvanced%20-%20DNS%20and%20Service%20Discovery.md#practical-example)
       - [MySQL](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md#mysql)
       - [WordPress](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md#wordpress)
