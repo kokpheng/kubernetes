@@ -32,6 +32,15 @@
       - [WordPress](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md#wordpress)
     - [Deploy MySQL](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md#deploy-mysql)
     - [Deploy WordPress](3.Advanced%20-%20DNS%20and%20Service%20Discovery.md#deploy-wordpress)
+- [4.Advanced - Volumes](4.Advanced%20-%20Volumes.md)
+    - [Introduction](4.Advanced%20-%20Volumes.md#introduction)
+    - [Volumes](4.Advanced%20-%20Volumes.md#volumes)
+      - [Using Volumes](4.Advanced%20-%20Volumes.md#using-volumes)
+      - [Using PersistentVolumes](4.Advanced%20-%20Volumes.md#using-persistentvolumes)
+      - [Creating A Volume](4.Advanced%20-%20Volumes.md#creating-a-volume)
+      - [Claiming A Volume](4.Advanced%20-%20Volumes.md#claiming-a-volume)
+    - [YAML Files Explanation](4.Advanced%20-%20Volumes.md#yaml-files-explanation)
+    - [Practical Example](4.Advanced%20-%20Volumes.md#practical-example)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
