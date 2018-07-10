@@ -41,6 +41,18 @@
       - [Claiming A Volume](4.Advanced%20-%20Volumes.md#claiming-a-volume)
     - [YAML Files Explanation](4.Advanced%20-%20Volumes.md#yaml-files-explanation)
     - [Practical Example](4.Advanced%20-%20Volumes.md#practical-example)
+- [5.Advanced - Secrets](5.Advanced%20-%20Secrets.md)
+    - [Introduction](5.Advanced%20-%20Secrets.md#introduction)
+    - [Secrets](5.Advanced%20-%20Secrets.md#secrets)
+    - [Creating A Secret](5.Advanced%20-%20Secrets.md#creating-a-secret)
+    - [Using A Secret - As an environment variable](5.Advanced%20-%20Secrets.md#using-a-secret---as-an-environment-variable)
+    - [Using A Secret - As an file](5.Advanced%20-%20Secrets.md#using-a-secret---as-an-file)
+- [6.Advanced - Usage & Resource Monitoring](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md)
+    - [Introduction](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#introduction)
+    - [Many Solutions](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#many-solutions)
+    - [Heapster](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#heapster)
+      - [Enabling Heapster on Minikube](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#enabling-heapster-on-minikube)
+    - [Grafana](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#grafana)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
