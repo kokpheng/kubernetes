@@ -53,6 +53,16 @@
     - [Heapster](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#heapster)
       - [Enabling Heapster on Minikube](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#enabling-heapster-on-minikube)
     - [Grafana](6.Advanced%20-%20Usage%20%26%20Resource%20Monitoring.md#grafana)
+- [7.Advanced - Namespaces & Resource Quotas](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md)
+    - [Introduction](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#introduction)
+    - [What are namespace? Why use them?](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#what-are-namespace-why-use-them)
+    - [Resource Limits in namespace](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#resource-limits-in-namespace)
+    - [Useful Commands for namespaces](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#useful-commands-for-namespaces)
+    - [Practical Example](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#practical-example)
+      1. [Create namespace](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#1-create-namespace)
+      2. [Assign Limit](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#2-assign-limit)
+      3. [Deploy Tomcat with Resource Request & Replica](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#3-deploy-tomcat-with-resource-request--replica)
+      4. [See Deployment Status](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#4-see-deployment-status)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
