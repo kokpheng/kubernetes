@@ -1,0 +1,1029 @@
+WEBVTT
+
+1
+00:00.000 --> 00:06.532
+Theme music plays
+
+2
+00:06.533 --> 00:09.599
+In the previous lecture we created a simple Kubernetes cluster
+
+3
+00:09.600 --> 00:12.432
+in AWS account using kops.
+
+4
+00:12.433 --> 00:16.332
+Now let’s examine how we can set up the key parts
+
+5
+00:16.333 --> 00:21.432
+of the high-availability cluster when creating the Kubernetes using kops.
+
+6
+00:21.433 --> 00:24.832
+Remember a lot of the managed Kubernetes services
+
+7
+00:24.833 --> 00:26.099
+will do this for us.
+
+8
+00:26.100 --> 00:30.699
+We’re using kops, so we can examine how to do this ourselves.
+
+9
+00:30.700 --> 00:34.699
+So that way when purchasing a service we at least have
+
+10
+00:34.700 --> 00:37.332
+a good idea of what’s going on under the hood.
+
+11
+00:37.333 --> 00:41.332
+Or if we need to we can always do it ourselves
+
+12
+00:41.333 --> 00:44.366
+and our own production cluster so that we manage it the future.
+
+13
+00:44.367 --> 00:49.766
+Remember one of the key high-availability design consideration
+
+14
+00:49.767 --> 00:52.232
+is how many Masters we will have.
+
+15
+00:52.233 --> 00:55.166
+An odd number is important.
+
+16
+00:55.167 --> 00:59.166
+Because Kubernetes uses an algorithm
+
+17
+00:59.167 --> 01:03.766
+to detect and choose how many Masters
+
+18
+01:03.767 --> 01:07.832
+need to be available an even number would create the situation
+
+19
+01:07.833 --> 01:10.599
+where there's an equal number of Masters that are down
+
+20
+01:10.600 --> 01:11.866
+and Masters that are up.
+
+21
+01:11.867 --> 01:14.499
+This would create a situation
+
+22
+01:14.500 --> 01:18.032
+where we are not sure if the cluster should be considered up or down.
+
+23
+01:18.033 --> 01:19.866
+It would essentially be a tie.
+
+24
+01:19.867 --> 01:23.932
+An odd number of Masters never lets this happen.
+
+25
+01:23.933 --> 01:26.332
+This is not specific to Kubernetes,
+
+26
+01:26.333 --> 01:29.399
+it’s called the M +1 problem in some ways.
+
+27
+01:29.400 --> 01:33.466
+It is something that is specific to most systems
+
+28
+01:33.467 --> 01:36.766
+that use redundancy for high-availability.
+
+29
+01:36.767 --> 01:40.899
+The second thing to consider
+
+30
+01:40.900 --> 01:42.932
+is where the Masters are located.
+
+31
+01:42.933 --> 01:46.132
+Are they located in the same building,
+
+32
+01:46.133 --> 01:47.466
+in the same data center,
+
+33
+01:47.467 --> 01:50.499
+the same city or even the same country.
+
+34
+01:50.500 --> 01:53.632
+We discussed these a few lectures ago
+
+35
+01:53.633 --> 01:56.099
+and your choices that you make are up to you.
+
+36
+01:56.100 --> 01:59.266
+They have to match your needs
+
+37
+01:59.267 --> 02:03.499
+otherwise they may be a mismatch between your expectations
+
+38
+02:03.500 --> 02:07.332
+and the requirements and what you could actual provide in terms of redundancy.
+
+39
+02:07.333 --> 02:13.599
+Are you willing to tolerate a citywide disaster;
+
+40
+02:13.600 --> 02:17.066
+a statewide disaster or a nationwide disaster.
+
+41
+02:17.067 --> 02:22.366
+Who knows you have to make this choices is based on the business line requirements
+
+42
+02:22.367 --> 02:24.266
+of your application running on Kubernetes.
+
+43
+02:24.267 --> 02:26.699
+Choosing ready his Masters are how many of them
+
+44
+02:26.700 --> 02:29.966
+can provide you with an idea of what you’re going to need
+
+45
+02:29.967 --> 02:34.066
+to provide resiliency for your high-availability design.
+
+46
+02:34.067 --> 02:38.732
+In our case we'll start with only three Masters
+
+47
+02:38.733 --> 02:42.032
+and we'll make sure they located in different availability zones.
+
+48
+02:42.033 --> 02:45.432
+AWAS availability zones if you're not familiar
+
+49
+02:45.433 --> 02:47.832
+are isolated failure areas.
+
+50
+02:47.833 --> 02:51.132
+You can think of them as separate data centers.
+
+51
+02:51.133 --> 02:53.766
+Even if they’re technically in the same area,
+
+52
+02:53.767 --> 02:55.999
+Amazon has warranted to us,
+
+53
+02:56.000 --> 02:57.499
+because of the way they’re designed,
+
+54
+02:57.500 --> 03:01.432
+that a power, a failure network or even a fire
+
+55
+03:01.433 --> 03:06.066
+in one availability zone within a reasonable probability
+
+56
+03:06.067 --> 03:08.066
+will not affect the other ones.
+
+57
+03:08.067 --> 03:10.299
+We can consider them for our uses today
+
+58
+03:10.300 --> 03:11.899
+independent data centers.
+
+59
+03:11.900 --> 03:15.366
+We'll use the kops create cluster command
+
+60
+03:15.367 --> 03:18.332
+as we did to create our cluster in the previous lecture.
+
+61
+03:18.333 --> 03:22.366
+But this time we'll specify a  few high availability options.
+
+62
+03:22.367 --> 03:24.999
+We'll specify how many Masters we'd like
+
+63
+03:25.000 --> 03:27.899
+and in which zone we'd like these Masters provision.
+
+64
+03:27.900 --> 03:32.066
+Let's actually create a high-availability cluster
+
+65
+03:32.067 --> 03:34.032
+and deploy an application to it.
+
+66
+03:34.033 --> 03:36.866
+First we'll use the kops create command
+
+67
+03:36.867 --> 03:40.066
+to create the cluster would be high-availability options,
+
+68
+03:40.067 --> 03:44.466
+then we'll look at the nodes to see where our multiple Masters exist.
+
+69
+03:44.467 --> 03:47.666
+And then we’ll deploy WordPress and MySQL
+
+70
+03:47.667 --> 03:51.366
+without volumes as we have in previous demonstrations
+
+71
+03:51.367 --> 03:55.899
+to see how an application is deployed to a high-availability cluster.
+
+72
+03:55.900 --> 04:02.766
+Creating a high-availability kops cluster using the kops toolset
+
+73
+04:02.767 --> 04:06.766
+is remarkably similar to creating  a non-ha cluster.
+
+74
+04:06.767 --> 04:11.032
+In the previous lecture when used kops to create
+
+75
+04:11.033 --> 04:15.466
+a single zone, single Master cluster.
+
+76
+04:15.467 --> 04:19.066
+If anything were to happen in US-West-2,
+
+77
+04:19.067 --> 04:21.432
+our cluster would not function.
+
+78
+04:21.433 --> 04:24.066
+Or if something would happen if the machine running our master
+
+79
+04:24.067 --> 04:25.866
+our cluster would not function.
+
+80
+04:25.867 --> 04:29.866
+We’ll use the same flow with a few new options
+
+81
+04:29.867 --> 04:32.399
+to set high-availability cluster using kops.
+
+82
+04:32.400 --> 04:38.632
+Our first step will be to ensure that environment variable first state store is set.
+
+83
+04:38.633 --> 04:40.932
+We’ll use the existing one we already have.
+
+84
+04:40.933 --> 04:48.066
+The export space all capital KOPS_STATE_STORE environment command
+
+85
+04:48.067 --> 04:51.032
+and setting it to S3 bucket we created.
+
+86
+04:51.033 --> 05:02.499
+Next we'll use the same kops create cluster command to start with,
+
+87
+05:02.500 --> 05:03.732
+then we’ll make some changes.
+
+88
+05:03.733 --> 05:12.766
+Kops space create space cluster with the name space – – zones
+
+89
+05:12.767 --> 05:16.032
+and we'll provide a comma-separated list of zones
+
+90
+05:16.033 --> 05:17.199
+in which we like to run.
+
+91
+05:17.200 --> 05:20.599
+We only ran in US–West-2A
+
+92
+05:20.600 --> 05:21.532
+in the previous lecture.
+
+93
+05:21.533 --> 05:28.832
+In this case since availability zones provides us with different redundancy and availability,
+
+94
+05:28.833 --> 05:31.566
+if one goes down is relatively certain another won’t
+
+95
+05:31.567 --> 05:33.799
+since they run in different places with different power
+
+96
+05:33.800 --> 05:36.099
+different connectivity etc.
+
+97
+05:36.100 --> 05:40.499
+Let's specify US–West-2B
+
+98
+05:40.500 --> 05:45.399
+and US-West–2C.
+
+99
+05:45.400 --> 05:48.566
+So three different zones separated by commas.
+
+100
+05:48.567 --> 05:53.999
+Then we will have to provide it ––node–count.
+
+101
+05:54.000 --> 05:55.532
+How many nodes do we like to run.
+
+102
+05:55.533 --> 05:58.266
+In this case let’s run three nodes.
+
+103
+05:58.267 --> 06:00.599
+One in each one of our clusters.
+
+104
+06:00.600 --> 06:03.332
+So we'll say node count three
+
+105
+06:03.333 --> 06:08.466
+Let’s also specify what zones we'd like our Masters to be in
+
+106
+06:08.467 --> 06:09.766
+not just our workers.
+
+107
+06:09.767 --> 06:14.399
+That’s done by specifying --master-zones.
+
+108
+06:14.400 --> 06:18.499
+We'll do the same US–West– 2A,
+
+109
+06:18.500 --> 06:25.432
+US–West–2B and US–West–2C.
+
+110
+06:25.433 --> 06:29.032
+It’s worth noting we’re creating a significant amount machine for this command,
+
+111
+06:29.033 --> 06:31.632
+you'd want sure that if you are going to run this command
+
+112
+06:31.633 --> 06:33.499
+that you’re willing to accept the charges.
+
+113
+06:33.500 --> 06:38.966
+So we're creating a replication factor of 3: 3 different zones
+
+114
+06:38.967 --> 06:40.166
+with three nodes.
+
+115
+06:40.167 --> 06:43.399
+We’re going to create many more nodes.
+
+116
+06:43.400 --> 06:45.399
+Three times more nodes than we have.
+
+117
+06:45.400 --> 06:51.832
+Let's press enter to issue the command.
+
+118
+06:51.833 --> 07:06.732
+Much like creating the cluster when we’re only creating one zone.
+
+119
+07:06.733 --> 07:09.232
+Kops is executing commands.
+
+120
+07:09.233 --> 07:12.199
+How as many more to run so this may take even longer.
+
+121
+07:12.200 --> 07:18.999
+Much like last time, we have to wait for our cluster to be ready.
+
+122
+07:19.000 --> 07:23.666
+Let's use kops validate cluster to see the current status.
+
+123
+07:23.667 --> 07:29.132
+As you can see we can’t even get the nodes quite yet
+
+124
+07:29.133 --> 07:32.632
+because we’re still waiting on AWS to provision our resources.
+
+125
+07:32.633 --> 07:33.899
+Let’s give it a moment.
+
+126
+07:33.900 --> 07:40.066
+Let’s run the command again to see where things are.
+
+127
+07:40.067 --> 07:47.766
+Looks like we’re still waiting on Amazon to provision our resources.
+
+128
+07:47.767 --> 07:53.866
+It seems we had some progress now but the Masters is still aren't ready.
+
+129
+07:53.867 --> 07:55.399
+the nodes have been created
+
+130
+07:55.400 --> 07:58.299
+and we can see three Masters have been created.
+
+131
+07:58.300 --> 08:01.866
+One in each availability zone that we've described.
+
+132
+08:01.867 --> 08:04.666
+And three worker nodes have been created.
+
+133
+08:04.667 --> 08:08.466
+Again one in every node in every availability zone that we've described.
+
+134
+08:08.467 --> 08:14.466
+Once the output from kops validate cluster
+
+135
+08:14.467 --> 08:18.966
+looks like this with a message your cluster is ready with its name.
+
+136
+08:18.967 --> 08:21.132
+You’re ready to move on to the next step.
+
+137
+08:21.133 --> 08:26.466
+This could take quite a bit of time as AWS has to provision resources
+
+138
+08:26.467 --> 08:28.332
+and once those resources come up,
+
+139
+08:28.333 --> 08:30.399
+they have to wait for processes to start.
+
+140
+08:30.400 --> 08:32.732
+Once your cluster is ready
+
+141
+08:32.733 --> 08:34.432
+we'll move on to looking at it.
+
+142
+08:34.433 --> 08:40.332
+Let’s use the Kubectl get nodes command
+
+143
+08:40.333 --> 08:43.099
+to look on the nodes running in our cluster.
+
+144
+08:43.100 --> 08:48.932
+You can see that we have three masters and three worker nodes.
+
+145
+08:48.933 --> 08:53.299
+This is what we expect
+
+146
+08:53.300 --> 08:58.966
+this way if anyone Master were to suffer an outage
+
+147
+08:58.967 --> 09:01.132
+another master will be able to take over.
+
+148
+09:01.133 --> 09:06.432
+Seeing that all of our nodes are up in the ready state
+
+149
+09:06.433 --> 09:09.899
+assures us that the nodes are up and properly working and accessible.
+
+150
+09:09.900 --> 09:15.666
+You may recall when we first set up WordPress and MYSQL
+
+151
+09:15.667 --> 09:19.199
+we did so without specifying any persistent volume.
+
+152
+09:19.200 --> 09:24.099
+We simple had WordPress and MySQL running as Docker containers.
+
+153
+09:24.100 --> 09:27.232
+We'll use those exact same deployment files.
+
+154
+09:27.233 --> 09:31.366
+In Kubernetes in production directory
+
+155
+09:31.367 --> 09:34.532
+under the setting up high-availability sub directory
+
+156
+09:34.533 --> 09:36.699
+of the GitHub repository for this course,
+
+157
+09:36.700 --> 09:40.932
+we have copies of both the MySQL-deployment.yaml
+
+158
+09:40.933 --> 09:43.732
+and the WordPress-deployment.yaml files.
+
+159
+09:43.733 --> 09:47.266
+These are identical configuration files to the ones that we used
+
+160
+09:47.267 --> 09:49.566
+in the DNS in-service discovery lecture.
+
+161
+09:49.567 --> 09:54.499
+We'll use these two to deploy WordPress and MySQL
+
+162
+09:54.500 --> 09:59.099
+without any persistent to our new highly available cluster.
+
+163
+09:59.100 --> 10:07.299
+Let's use the kubectl apply – f ./MySQL– WordPress.yaml command
+
+164
+10:07.300 --> 10:11.699
+to create MySQL deployment on a cluster.
+
+165
+10:11.700 --> 10:16.566
+We'll see that the service and the deployment were properly created.
+
+166
+10:16.567 --> 10:21.399
+Let’s do same for WordPress.
+
+167
+10:21.400 --> 10:38.866
+Let’s use the Kubectl get deployments command
+
+168
+10:38.867 --> 10:40.599
+to look at the status of our deployments.
+
+169
+10:40.600 --> 10:51.166
+You can see that MySQL is fully available
+
+170
+10:51.167 --> 10:53.399
+were as WordPress is still coming up.
+
+171
+10:53.400 --> 10:57.766
+Let’s run it again to see if WordPress is available now.
+
+172
+10:57.767 --> 11:02.699
+Both our deployments have deployed just as they would
+
+173
+11:02.700 --> 11:05.432
+on a regular nonredundant cluster.
+
+174
+11:05.433 --> 11:07.066
+But in the high-availability cluster
+
+175
+11:07.067 --> 11:11.132
+it’s now running on top of a more resilient fabric.
+
+176
+11:11.133 --> 11:15.132
+As you can see nothing is really change from deployment perspective,
+
+177
+11:15.133 --> 11:20.066
+it’s simply the workings of the underlying services of Kubernetes,
+
+178
+11:20.067 --> 11:22.332
+which ever come more resilient and robust.
+
+179
+11:22.333 --> 11:24.866
+Are they working on a high availability cluster
+
+180
+11:24.867 --> 11:27.399
+or a small cluster or a minikube,
+
+181
+11:27.400 --> 11:30.499
+the higher-level command largely remain the same.
+
+182
+11:30.500 --> 11:38.266
+Let's use the kubectl describe deployment command
+
+183
+11:38.267 --> 11:44.266
+to look at the status of WordPress.
+
+184
+11:44.267 --> 11:56.099
+Everything looks normal to us.
+
+185
+11:56.100 --> 12:00.199
+Now since we have multiple nodes and this is something that we haven’t done before.
+
+186
+12:00.200 --> 12:03.099
+Let's look at the pod that is running our deployment
+
+187
+12:03.100 --> 12:04.632
+and see what nodes it's running on.
+
+188
+12:04.633 --> 12:09.066
+Let’s use the Kubectl describe pods command
+
+189
+12:09.067 --> 12:11.332
+to look at the pods running on our system.
+
+190
+12:11.333 --> 12:21.499
+If we scroll up there is quite a bit of output from this command,
+
+191
+12:21.500 --> 12:23.632
+we can see the WordPress MySQL pod,
+
+192
+12:23.633 --> 12:29.799
+this part of the screen is defined as unique pod name at runtime
+
+193
+12:29.800 --> 12:40.732
+is running on a node name IP–172–20–86–23.
+
+194
+12:40.733 --> 12:45.799
+The scheduler chose this node base on a variety of factors.
+
+195
+12:45.800 --> 12:48.932
+Availability CPU use etc.
+
+196
+12:48.933 --> 12:59.166
+If we keep scrolling up we can see the WordPress pod.
+
+197
+12:59.167 --> 13:02.632
+It's running on the same node.
+
+198
+13:02.633 --> 13:11.499
+Kubernetes automatically decide which node to deploy a service to
+
+199
+13:11.500 --> 13:13.099
+and deploy a given pod to.
+
+200
+13:13.100 --> 13:17.732
+It manages all of that scheduling using the default scheduling algorithm
+
+201
+13:17.733 --> 13:20.299
+and you can the see history for that in events.
+
+202
+13:20.300 --> 13:23.032
+The default scheduler assign a node,
+
+203
+13:23.033 --> 13:31.532
+the pod to run and then further went started the container
+
+204
+13:31.533 --> 13:33.299
+and made it available.
+
+205
+13:33.300 --> 13:39.532
+Whether you have one or many nodes
+
+206
+13:39.533 --> 13:43.132
+Kubernetes handles that process for you.
+
+207
+13:43.133 --> 13:48.599
+Of course none of this is particularly interesting to us or to our users,
+
+208
+13:48.600 --> 13:50.199
+if we can use the service.
+
+209
+13:50.200 --> 13:56.032
+Remember when we create the WordPress yaml file.
+
+210
+13:56.033 --> 13:58.932
+We specify an external service.
+
+211
+13:58.933 --> 14:06.999
+Let’s get the details of this service using the kubectl describe service
+
+212
+14:07.000 --> 14:12.032
+WordPress command.
+
+213
+14:12.033 --> 14:15.832
+This’ll give us information about the service
+
+214
+14:15.833 --> 14:17.932
+exposing our WordPress container.
+
+215
+14:17.933 --> 14:20.666
+We created it as a load balancer
+
+216
+14:20.667 --> 14:22.766
+since we're on AMAZON AWS,
+
+217
+14:22.767 --> 14:25.766
+we can look at the load balancer ingress.
+
+218
+14:25.767 --> 14:29.132
+Which is a host name, let's copy that to the clipboard
+
+219
+14:29.133 --> 14:33.366
+and look at a web browser and see what that does.
+
+220
+14:33.367 --> 14:39.899
+Let’s navigate to that URL in a web browser.
+
+221
+14:39.900 --> 14:43.366
+This should look familiar.
+
+222
+14:43.367 --> 14:48.666
+This is our WordPress installation now running on our highly redundant Kubernetes cluster.
+
+223
+14:48.667 --> 14:59.532
+Unlike on our minikube this was actually served up from behind the load balancer described here.
+
+224
+14:59.533 --> 15:04.032
+This was an Amazon Elastic Load balancer or ELB
+
+225
+15:04.033 --> 15:08.166
+that Kubernetes  dynamically provisioned and provided us access to.
+
+226
+15:08.167 --> 15:12.899
+In this exercise you've seen how we've set up a highly available cluster
+
+227
+15:12.900 --> 15:16.066
+by specifying the high-availability options.
+
+228
+15:16.067 --> 15:19.699
+We set how many extra nodes we'd like to create.
+
+229
+15:19.700 --> 15:22.066
+How many extra Master nodes we'd like create.
+
+230
+15:22.067 --> 15:27.932
+And where we'd like to create them to provide a more robust and resilient fabric for Kubernetes.
+
+231
+15:27.933 --> 15:31.632
+We'll also note that simply doing this,
+
+232
+15:31.633 --> 15:35.199
+didn’t change the way we interact with Kubernetes.
+
+233
+15:35.200 --> 15:38.266
+Because Kubernetes provides isolation
+
+234
+15:38.267 --> 15:43.232
+and provides a relatively black box scalability system,
+
+235
+15:43.233 --> 15:47.332
+we were able to create a more highly available Kubernetes cluster.
+
+236
+15:47.333 --> 15:50.799
+And not have to make any changes at the application layer to deployments
+
+237
+15:50.800 --> 15:53.666
+to take advantage of this new highly available cluster.
+
+238
+15:53.667 --> 15:59.466
+This provides a variety of mechanisms to the System Administrator
+
+239
+15:59.467 --> 16:03.866
+and the application designer to be able to separate the needs of deployment,
+
+240
+16:03.867 --> 16:07.399
+resiliency, scale and the nature of being robust
+
+241
+16:07.400 --> 16:10.932
+and the application developer, which developed the individual application.
+
+242
+16:10.933 --> 16:16.732
+This also provides us with the ability to grow the application
+
+243
+16:16.733 --> 16:17.966
+as we may need to.
+
+244
+16:17.967 --> 16:21.432
+We can start small on a non-highly available cluster
+
+245
+16:21.433 --> 16:26.132
+and move the highly available cluster without making significant or any changes to our application.
+
+246
+16:26.133 --> 16:31.932
+Remember unless you'd like to follow along in the next lecture immediately
+
+247
+16:31.933 --> 16:35.632
+, take the time to delete your cluster.
+
+248
+16:35.633 --> 16:41.566
+This will prevent any further charges from accruing on your Amazon AWS account.
+
+249
+16:41.567 --> 16:45.532
+Of course if you’d like to accrue these charges and leave the cluster running that’s your choice.
+
+250
+16:45.533 --> 16:52.399
+Again use the  kops delete cluster the name of your cluster
+
+251
+16:52.400 --> 16:56.432
+--yes command to  delete the cluster and release the resources.
+
+252
+16:56.433 --> 17:11.499
+This may take a moment
+
+253
+17:11.500 --> 17:16.932
+similar to last time.The cluster successfully deleted
+
+254
+17:16.933 --> 17:20.266
+output is your confirmation that resources were released.
+
+255
+17:20.267 --> 17:26.299
+As always there could be bugs in the software and kops may not have succeeded in deleting everything.
+
+256
+17:26.300 --> 17:28.499
+To be sure the charges are stopped,
+
+257
+17:28.500 --> 17:34.767
+close your Amazon AWS account or access the billing interface to ensure no billable items exist.

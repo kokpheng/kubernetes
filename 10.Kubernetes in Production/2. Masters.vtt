@@ -1,0 +1,2469 @@
+WEBVTT
+
+1
+00:00.000 --> 00:05.432
+Theme music plays
+
+2
+00:05.433 --> 00:09.632
+In the previous lecture we discussed setting up multiple Masters
+
+3
+00:09.633 --> 00:12.799
+as a key aspect of high-availability Kubernetes.
+
+4
+00:12.800 --> 00:15.732
+Let’s look a bit more into the Master,
+
+5
+00:15.733 --> 00:17.466
+what it does and how it does it
+
+6
+00:17.467 --> 00:19.166
+so we get the better understanding
+
+7
+00:19.167 --> 00:22.366
+of what this key component of Kubernetes
+
+8
+00:22.367 --> 00:25.866
+(and especially highly available Kubernetes) actually does.
+
+9
+00:25.867 --> 00:29.332
+Kubernetes Masters, as we discussed,
+
+10
+00:29.333 --> 00:31.699
+typically run three key processes.
+
+11
+00:31.700 --> 00:34.499
+They may run more but at least run these three.
+
+12
+00:34.500 --> 00:37.566
+Number one, a kube-apiserver,
+
+13
+00:37.567 --> 00:40.032
+number two, a Kube-controller-manager
+
+14
+00:40.033 --> 00:42.332
+and number three, a kube-scheduler.
+
+15
+00:42.333 --> 00:46.266
+These processes access and rely on etcd,
+
+16
+00:46.267 --> 00:51.066
+remember from the previous lecture that etcd is a distributed key store.
+
+17
+00:51.067 --> 00:55.932
+That stores the data about the cluster that these services might need to use.
+
+18
+00:55.933 --> 01:01.199
+To take a look at a Master we are going to need something bigger than the Minikube.
+
+19
+01:01.200 --> 01:03.699
+Remember from earlier in this lecture series
+
+20
+01:03.700 --> 01:06.432
+that Minikube packages the Kubernetes software
+
+21
+01:06.433 --> 01:09.666
+into something that’s convenient to run on a single machine.
+
+22
+01:09.667 --> 01:14.799
+This makes some compromises to provide that use of access
+
+23
+01:14.800 --> 01:16.232
+to the Kubernetes software.
+
+24
+01:16.233 --> 01:21.332
+One of these compromises is that a Master is running in the same process
+
+25
+01:21.333 --> 01:25.766
+on the same machine as the worker node and a variety of other items
+
+26
+01:25.767 --> 01:30.099
+required to run the Kubernetes cluster.
+
+27
+01:30.100 --> 01:34.599
+Examining the master is going to be difficult if it all on the same machine.
+
+28
+01:34.600 --> 01:40.899
+So we’ll take this opportunity to set up a Kubernetes cluster on Amazon Web Services.
+
+29
+01:40.900 --> 01:45.399
+This will be an actual Kubernetes cluster on a cloud-computing provider.
+
+30
+01:45.400 --> 01:48.066
+You’ll need an AWS account,
+
+31
+01:48.067 --> 01:51.766
+don’t worry if you don’t have one, we'll show you where you can create one.
+
+32
+01:51.767 --> 01:54.899
+If you already have one you can use that
+
+33
+01:54.900 --> 01:57.732
+regardless there’re a few things that we’d like you to know.
+
+34
+01:57.733 --> 02:02.832
+First AWS or Amazon Web Services is a cloud-computing provider
+
+35
+02:02.833 --> 02:04.932
+that provides access to virtual servers.
+
+36
+02:04.933 --> 02:07.399
+Along with the variety of managed services
+
+37
+02:07.400 --> 02:11.399
+ranging from object storage to DNS, databases and beyond.
+
+38
+02:11.400 --> 02:14.966
+AWS accounts are free to set up,
+
+39
+02:14.967 --> 02:16.732
+although they do require a credit card.
+
+40
+02:16.733 --> 02:19.699
+But they are not necessarily always free to use.
+
+41
+02:19.700 --> 02:21.766
+This is important to understand.
+
+42
+02:21.767 --> 02:26.999
+Even though they provide a free tier setting up a Kubernetes cluster like we’re going to do
+
+43
+02:27.000 --> 02:30.632
+on AWS does not fit inside this usage allowance.
+
+44
+02:30.633 --> 02:32.866
+It will incur costs to you,
+
+45
+02:32.867 --> 02:34.799
+depending on how long you leave it running.
+
+46
+02:34.800 --> 02:38.066
+Amazon sells the use of their services,
+
+47
+02:38.067 --> 02:40.799
+virtual machines, networks etc.
+
+48
+02:40.800 --> 02:44.432
+based on how long you use them and how much you use them.
+
+49
+02:44.433 --> 02:46.832
+There will be a cost associated with it.
+
+50
+02:46.833 --> 02:51.632
+And make sure that you know that your account is set up
+
+51
+02:51.633 --> 02:55.632
+and authorized to incur that span and that you are willing to do so.
+
+52
+02:55.633 --> 02:58.332
+So unless you’re prepared to accrue and pay these charges
+
+53
+02:58.333 --> 03:01.266
+and you’re confident that you'll able to properly stop
+
+54
+03:01.267 --> 03:03.966
+and release all the costs incur in resources,
+
+55
+03:03.967 --> 03:07.266
+you may want to consider just watching and following along.
+
+56
+03:07.267 --> 03:09.299
+The choice is up to you.
+
+57
+03:09.300 --> 03:14.332
+About an hours worth of use at current prices for what we are going to demonstrate
+
+58
+03:14.333 --> 03:17.732
+would cost around $10 but that’s not a guarantee
+
+59
+03:17.733 --> 03:22.366
+and make sure that you know how to track costs if that something that’s important to you.
+
+60
+03:22.367 --> 03:29.499
+You can set up an account at www.amazonaws.com
+
+61
+03:29.500 --> 03:31.532
+or log into your existing one.
+
+62
+03:31.533 --> 03:34.366
+Once you have an account or using your existing one
+
+63
+03:34.367 --> 03:37.932
+we'll log in and will grab a few important security credentials
+
+64
+03:37.933 --> 03:40.299
+we need to set up our Kubernetes cluster.
+
+65
+03:40.300 --> 03:44.332
+Regardless of what you need to set up an account or log into your existing one
+
+66
+03:44.333 --> 03:50.399
+let’s begin by going into www.amazonaws.com in a web browser.
+
+67
+03:50.400 --> 03:54.799
+Whether you need to create new account or log into an existing one,
+
+68
+03:54.800 --> 04:00.299
+https://aws.amazon.com here's your start.
+
+69
+04:00.300 --> 04:03.266
+Let’s click sign into the console.
+
+70
+04:03.267 --> 04:06.332
+Whether we need to create new account or log into an existing one,
+
+71
+04:06.333 --> 04:08.132
+we can do that here.
+
+72
+04:08.133 --> 04:13.266
+If you want the create a new account click the create a new AWS account button.
+
+73
+04:13.267 --> 04:17.132
+It will collect some information including your credit card and email address.
+
+74
+04:17.133 --> 04:19.332
+You'll have to verify your email address.
+
+75
+04:19.333 --> 04:22.166
+Like clicking on a link they’ll send you in an email.
+
+76
+04:22.167 --> 04:25.199
+At that point your AWS account should be ready to use.
+
+77
+04:25.200 --> 04:28.299
+And you can come back after you pause this video.
+
+78
+04:28.300 --> 04:32.166
+If you have some problems signing up Amazon offer support
+
+79
+04:32.167 --> 04:36.366
+through out the process by clicking any of the help buttons or replying to emails
+
+80
+04:36.367 --> 04:38.199
+that you get to verify your account.
+
+81
+04:38.200 --> 04:41.466
+If you already have an account
+
+82
+04:41.467 --> 04:43.466
+or you’re returning from the sign-up process,
+
+83
+04:43.467 --> 04:46.332
+lets log into our account by entering email address
+
+84
+04:46.333 --> 04:48.832
+clicking next and typing in our password.
+
+85
+04:48.833 --> 04:54.499
+Once you've completed that you’ll be logged into the console.
+
+86
+04:54.500 --> 05:04.332
+AWS management console provides access to nearly every Amazon products and services
+
+87
+05:04.333 --> 05:07.799
+As we've mentioned earlier in AWS provides a wide gamut of services
+
+88
+05:07.800 --> 05:10.866
+that are well beyond the scope of setting up Kubernetes.
+
+89
+05:10.867 --> 05:12.799
+If this looks a little daunting to you,
+
+90
+05:12.800 --> 05:15.932
+don’t worry we’re only going to use a few services
+
+91
+05:15.933 --> 05:19.399
+and we'll walk through each of them independently as we use them.
+
+92
+05:19.400 --> 05:24.732
+This console can provide you with access to the full breath of services
+
+93
+05:24.733 --> 05:27.066
+and if you’d like to explore it feel free.
+
+94
+05:27.067 --> 05:31.432
+For our purposes we're going to focus only on the EC2
+
+95
+05:31.433 --> 05:34.066
+or the Elastic Compute Cloud Service
+
+96
+05:34.067 --> 05:38.399
+and the Amazon S3 service,
+
+97
+05:38.400 --> 05:40.332
+the simple storage service
+
+98
+05:40.333 --> 05:47.166
+which provides a storage service accessible easily for applications running on and off Amazon's cloud.
+
+99
+05:47.167 --> 05:54.199
+Since we're going to use the kops toolset to create our Kubernetes cluster.
+
+100
+05:54.200 --> 05:58.866
+We won’t need to access the management interface for too many tasks.
+
+101
+05:58.867 --> 06:03.232
+However what we will need to do to provide the kops toolset
+
+102
+06:03.233 --> 06:05.499
+with access to our Amazon account,
+
+103
+06:05.500 --> 06:10.432
+is download some security credentials which uniquely identify our account
+
+104
+06:10.433 --> 06:14.466
+and allow us to securely communicate with AWS’s API.
+
+105
+06:14.467 --> 06:18.032
+To do this let’s go in the upper right hand corner
+
+106
+06:18.033 --> 06:19.066
+where our name is.
+
+107
+06:19.067 --> 06:21.432
+And go to My Security Credentials.
+
+108
+06:21.433 --> 06:27.466
+If you receive a warning message,
+
+109
+06:27.467 --> 06:32.799
+which you might if you’re logging in from the root account that you created, which is the default.
+
+110
+06:32.800 --> 06:35.532
+Click Continue to Security Credentials.
+
+111
+06:35.533 --> 06:38.566
+This warning message is for production customers
+
+112
+06:38.567 --> 06:42.032
+running large Amazon Web Services deployments
+
+113
+06:42.033 --> 06:49.032
+in an organization with needs to have segmented roles and applications using the IAM product.
+
+114
+06:49.033 --> 06:53.732
+For now access using our root credentials is exactly what we would like to do.
+
+115
+06:53.733 --> 06:59.532
+From here click the access keys button;
+
+116
+06:59.533 --> 07:02.066
+we'd like to create an access key,
+
+117
+07:02.067 --> 07:07.132
+which we’ll share with the AWS command line tools that we’ll install our system.
+
+118
+07:07.133 --> 07:11.466
+So that those tools can be used by kops to create instances
+
+119
+07:11.467 --> 07:13.699
+and provision our Kubernetes cluster.
+
+120
+07:13.700 --> 07:16.066
+Click Create New Access key.
+
+121
+07:16.067 --> 07:21.766
+Click show access key.
+
+122
+07:21.767 --> 07:26.132
+And note these values down.
+
+123
+07:26.133 --> 07:27.832
+You can copy them to the clipboard
+
+124
+07:27.833 --> 07:30.899
+and save them in password manager of your choice.
+
+125
+07:30.900 --> 07:34.699
+You can print them or you can click the download key file
+
+126
+07:34.700 --> 07:37.132
+to download the file to your machine.
+
+127
+07:37.133 --> 07:40.766
+We’ll need both of these values exactly
+
+128
+07:40.767 --> 07:43.899
+over the course of the next lecture and this lecture
+
+129
+07:43.900 --> 07:46.199
+to be able to access our cluster.
+
+130
+07:46.200 --> 07:49.532
+It will only be displayed once.
+
+131
+07:49.533 --> 07:53.032
+So make sure that you copy them down and store them in a secure place.
+
+132
+07:53.033 --> 07:57.699
+As these offer full access to your Amazon AWS account.
+
+133
+07:57.700 --> 08:01.999
+Now that we have an Amazon.com AWS account set up
+
+134
+08:02.000 --> 08:04.432
+and some security credentials created,
+
+135
+08:04.433 --> 08:07.332
+let’s set up a simple cluster on AWS.
+
+136
+08:07.333 --> 08:11.132
+Just like anything in cloud computing world,
+
+137
+08:11.133 --> 08:14.099
+you have a bit of choice in how much you’d like to manually
+
+138
+08:14.100 --> 08:17.866
+or how much you like to buy prebuilt from a given solution provider.
+
+139
+08:17.867 --> 08:22.699
+Amazon provides Kubernetes clusters out-of-the-box now.
+
+140
+08:22.700 --> 08:25.899
+It's there service called Elastic Kubernetes Service.
+
+141
+08:25.900 --> 08:31.799
+They manage all of the redundancy and high-availably items of your Master and at etcd for you.
+
+142
+08:31.800 --> 08:34.299
+The set up is highly automated and very friendly.
+
+143
+08:34.300 --> 08:37.599
+It's definitely production grade.
+
+144
+08:37.600 --> 08:40.899
+However because it is so simple to use,
+
+145
+08:40.900 --> 08:45.899
+it doesn’t give us the experience of setting up our own cluster
+
+146
+08:45.900 --> 08:48.799
+and introspecting the various parts of it.
+
+147
+08:48.800 --> 08:51.432
+So we'll use kops,
+
+148
+08:51.433 --> 08:56.066
+K O P S,  a suite of software provided by Kubernetes maintainers
+
+149
+08:56.067 --> 08:59.332
+to do a bit more of the manual work to set up our own cluster.
+
+150
+08:59.333 --> 09:02.666
+Now we could manually set up each Linux node from scratch
+
+151
+09:02.667 --> 09:05.666
+and manually edit countless text files
+
+152
+09:05.667 --> 09:11.699
+or on the other extreme we could buy a set of cluster set up for us using the Elastic Kubernetes Service.
+
+153
+09:11.700 --> 09:17.899
+However, using kops will provide us with a happy balance between the two.
+
+154
+09:17.900 --> 09:22.532
+It will give us the flexibility to look at and specify things about our Masters
+
+155
+09:22.533 --> 09:26.066
+and actually interact with our Masters once it is set up.
+
+156
+09:26.067 --> 09:28.099
+The other services may not let us do.
+
+157
+09:28.100 --> 09:29.899
+They may hide those details from us.
+
+158
+09:29.900 --> 09:33.866
+But at the same time it will take a lot of the manual drudgery
+
+159
+09:33.867 --> 09:37.466
+of having to set up manual configuration files and upload them
+
+160
+09:37.467 --> 09:39.866
+and set up a base Linux system
+
+161
+09:39.867 --> 09:41.399
+and automate that for us
+
+162
+09:41.400 --> 09:44.432
+because those are largely outside the scope of this lecture anyway.
+
+163
+09:44.433 --> 09:46.966
+It will allow us to focus our time and our energy on
+
+164
+09:46.967 --> 09:48.666
+learning the key part of Kubernetes.
+
+165
+09:48.667 --> 09:50.132
+So we'll use kops.
+
+166
+09:50.133 --> 09:54.766
+Doing this has a few key steps.
+
+167
+09:54.767 --> 09:58.699
+First, we'll download and install kops on our local machine.
+
+168
+09:58.700 --> 10:04.432
+Next, we'll download and configure and install the "aws" command line tool suite.
+
+169
+10:04.433 --> 10:07.466
+We'll also use the security credential we've just created.
+
+170
+10:07.467 --> 10:11.566
+So "aws" knows what account to create our resources in.
+
+171
+10:11.567 --> 10:15.832
+The "kops" tool will rely on some of the AWS tool sets
+
+172
+10:15.833 --> 10:18.532
+and APIs to create resources for us,
+
+173
+10:18.533 --> 10:21.266
+so we don't have to do things like spin up our own Linux  instances.
+
+174
+10:21.267 --> 10:25.199
+Then we'll create and AWS S3 bucket,
+
+175
+10:25.200 --> 10:29.899
+which is Amazon's block an object storage facility.
+
+176
+10:29.900 --> 10:33.599
+As a "state store" That will store the state of our cluster.
+
+177
+10:33.600 --> 10:37.099
+What the machines are and how they're configured etc.
+
+178
+10:37.100 --> 10:40.066
+Finally we'll create the cluster using "kops".
+
+179
+10:40.067 --> 10:41.866
+Let's get started.
+
+180
+10:41.867 --> 10:45.466
+Our first step is to download and install "kops" on our local machine.
+
+181
+10:45.467 --> 10:55.099
+Depending on your configuration and the type of system you're using
+
+182
+10:55.100 --> 10:59.366
+we'll have to install kops using a package manager or manually.
+
+183
+10:59.367 --> 11:02.632
+To get the latest version of "kops"
+
+184
+11:02.633 --> 11:08.232
+let's go to Google and find the "kops" GitHup repository by searching
+
+185
+11:08.233 --> 11:11.332
+for Kubernetes  kops.
+
+186
+11:11.333 --> 11:16.832
+In this case hit is the appropriate one.
+
+187
+11:16.833 --> 11:19.366
+The GitHub page for Kubernetes "kops".
+
+188
+11:19.367 --> 11:28.632
+If we scroll down the install instructions are available in the readme file.
+
+189
+11:28.633 --> 11:38.766
+On a Mac OS system you can use the brew package manager
+
+190
+11:38.767 --> 11:42.099
+as described here to install the "kops" binaries.
+
+191
+11:42.100 --> 11:47.699
+This is the preferred and easiest way to make sure that it's properly installed and up to date.
+
+192
+11:47.700 --> 11:52.832
+On Linux systems you can use the following commands to download
+
+193
+11:52.833 --> 11:58.132
+the latest version and install it and make it available for use.
+
+194
+11:58.133 --> 12:11.666
+Both of these methods should simply, with one run of the respective commands,
+
+195
+12:11.667 --> 12:14.566
+create a working "kops" install.
+
+196
+12:14.567 --> 12:18.632
+No other configuration is required at the step.
+
+197
+12:18.633 --> 12:22.499
+Whether you're running an OSX or a Linux system.
+
+198
+12:22.500 --> 12:26.899
+Run the commands and it should return successfully and we'll continue.
+
+199
+12:26.900 --> 12:33.399
+For example on a Linux system
+
+200
+12:33.400 --> 12:37.532
+let's copy the three commands to the clipboard
+
+201
+12:37.533 --> 12:40.966
+by selecting them, copying them to clipboard,
+
+202
+12:40.967 --> 12:45.366
+going to our terminal and pasting the commands.
+
+203
+12:45.367 --> 12:49.066
+This will download the kops toolset.
+
+204
+12:49.067 --> 12:55.032
+Depending on the speed of your connection this may take a moment.
+
+205
+12:55.033 --> 13:01.499
+It will then unpack the tools,
+
+206
+13:01.500 --> 13:08.332
+make them executable and copy them into a common area and path.
+
+207
+13:08.333 --> 13:13.199
+Type in kops -
+
+208
+13:13.200 --> 13:15.066
+it should give us the help screen for kops.
+
+209
+13:15.067 --> 13:17.399
+We know it's successfully installed.
+
+210
+13:17.400 --> 13:22.332
+We'll configure it to access Amazon AWS in the next step.
+
+211
+13:22.333 --> 13:30.499
+It should be noted that kops was natively developed from Linux and OS X.
+
+212
+13:30.500 --> 13:33.666
+Window support was introduced in mid-2017
+
+213
+13:33.667 --> 13:35.966
+and is claimed to be working.
+
+214
+13:35.967 --> 13:39.932
+But remains highly experimental and relatively undocumented.
+
+215
+13:39.933 --> 13:45.199
+You can search the kops GitHub repository for Windows support if you're adventurous.
+
+216
+13:45.200 --> 13:49.066
+There are a few notes on the GitHub issue
+
+217
+13:49.067 --> 13:52.432
+as to kop.exe working.
+
+218
+13:52.433 --> 13:56.866
+However the documentation as of now was relatively sparse
+
+219
+13:56.867 --> 13:58.199
+and it is not recommended.
+
+220
+13:58.200 --> 14:03.799
+Cygwin & the Windows Linux Subsystem are untested and unrecommended.
+
+221
+14:03.800 --> 14:06.999
+Again however if you are adventurous and familiar with these tools,
+
+222
+14:07.000 --> 14:09.666
+you may want to try running kops
+
+223
+14:09.667 --> 14:14.632
+under these Linux emulation or substitution systems in Windows.
+
+224
+14:14.633 --> 14:17.566
+But there has been no guarantee and there is no official support.
+
+225
+14:17.567 --> 14:20.266
+If you'd like to run kops under Windows machine
+
+226
+14:20.267 --> 14:22.566
+and don't want to be that adventurous,
+
+227
+14:22.567 --> 14:26.432
+it is suggested to run a Linux VM on your Windows machine
+
+228
+14:26.433 --> 14:32.099
+and follow the Linux instructions for kops and for the AWS toolkit in the next step
+
+229
+14:32.100 --> 14:34.666
+inside the established Virtual Machine.
+
+230
+14:34.667 --> 14:36.599
+You have a few options here.
+
+231
+14:36.600 --> 14:39.832
+Virtual Box is free and well documented.
+
+232
+14:39.833 --> 14:44.666
+By Googling Virtual Box and going to the Virtual Box website
+
+233
+14:44.667 --> 14:48.066
+you can download a free piece of software
+
+234
+14:48.067 --> 14:50.732
+that will run a Linux Virtual Machine
+
+235
+14:50.733 --> 14:54.466
+and has step by instructions on how to establish it.
+
+236
+14:54.467 --> 15:00.532
+There is a relative large community and this has been done by many people in the Kubernetes community.
+
+237
+15:00.533 --> 15:03.032
+So your support options are pretty strong.
+
+238
+15:03.033 --> 15:08.099
+Hyper-V is Microsoft virtualization solution available on some Windows platforms.
+
+239
+15:08.100 --> 15:15.099
+As an include Microsoft technology of course it offers great support,
+
+240
+15:15.100 --> 15:19.199
+however, documentation on this route doesn’t appear to be as voluminous
+
+241
+15:19.200 --> 15:21.799
+as setting up Linux VM on Virtual Box.
+
+242
+15:21.800 --> 15:25.299
+There are other commercial options also available.
+
+243
+15:25.300 --> 15:28.099
+Evaluate which one might be best for you
+
+244
+15:28.100 --> 15:32.066
+and search the documentation to set up a Linux Virtual Machine.
+
+245
+15:32.067 --> 15:35.566
+A recent version  of Ubuntu Linux
+
+246
+15:35.567 --> 15:40.066
+is likely to be the most well supported of the kops toolset.
+
+247
+15:40.067 --> 15:42.899
+However if you're familiar with the different Linux distribution
+
+248
+15:42.900 --> 15:46.166
+or have a different Linux distribution available on your machine already,
+
+249
+15:46.167 --> 15:47.799
+feel free to use that as well.
+
+250
+15:47.800 --> 15:53.532
+And follow the Linux instructions for both the kops toolset and the up coming steps for AWS.
+
+251
+15:53.533 --> 15:56.532
+Now that we've set up and installed kops,
+
+252
+15:56.533 --> 15:59.766
+let's do the same for the "aws" command line tool suite
+
+253
+15:59.767 --> 16:05.966
+that we'll need to access and create resources on Amazon AWS.
+
+254
+16:05.967 --> 16:11.566
+Let's take a similar approach to installing the AWS command line tool.
+
+255
+16:11.567 --> 16:17.566
+Since systems vary, let's go to Google and consult Amazon documentation
+
+256
+16:17.567 --> 16:19.466
+for installing their toolset.
+
+257
+16:19.467 --> 16:23.466
+You can Google any search terms of course
+
+258
+16:23.467 --> 16:29.966
+but the most precise would be something like AWS command line tool install.
+
+259
+16:29.967 --> 16:31.532
+Let see what that gets us.
+
+260
+16:31.533 --> 16:36.199
+Your mileage might vary but in this case the official documentation
+
+261
+16:36.200 --> 16:39.832
+from Amazon AWS is probably the best bet.
+
+262
+16:39.833 --> 16:41.332
+Let's click on it.
+
+263
+16:41.333 --> 16:44.332
+This documentation changes from time to time
+
+264
+16:44.333 --> 16:46.199
+so it might look a little bit different,
+
+265
+16:46.200 --> 16:50.699
+however the general idea is likely very much the same.
+
+266
+16:50.700 --> 16:54.766
+The default instructions require Python installed on your system.
+
+267
+16:54.767 --> 16:59.799
+If you're experienced with the command line use and are comfortable using these instructions
+
+268
+16:59.800 --> 17:04.466
+go ahead assuming that you know that you have Python installed.
+
+269
+17:04.467 --> 17:10.566
+To be safe we can also use AWS's bundled installer.
+
+270
+17:10.567 --> 17:15.399
+This doesn't require Python and if you are unsure if you have Python installed
+
+271
+17:15.400 --> 17:16.699
+or don't know what that means,
+
+272
+17:16.700 --> 17:19.766
+click try the bundled installer.
+
+273
+17:19.767 --> 17:29.232
+Next let's go to install the AWS cli using the bundle installer section.
+
+274
+17:29.233 --> 17:34.632
+We'll follow these directions  in order to install it properly.
+
+275
+17:34.633 --> 17:42.732
+If you are on Mac OS and you have homebrew installed
+
+276
+17:42.733 --> 17:46.466
+you could also use the brew install AWS command
+
+277
+17:46.467 --> 17:48.899
+if you'd like and are comfortable with that.
+
+278
+17:48.900 --> 18:04.066
+The first step is to download the AWS CLI bundle.
+
+279
+18:04.067 --> 18:05.366
+Let's do that.
+
+280
+18:05.367 --> 18:16.366
+Depending on your connection speed this may take a moment.
+
+281
+18:16.367 --> 18:21.966
+Once it's downloaded, let's use the next command to unzip it.
+
+282
+18:21.967 --> 18:30.366
+Next let's run the install executable.
+
+283
+18:30.367 --> 18:45.799
+Depending on the speed of your system this may take a moment.
+
+284
+18:45.800 --> 18:50.866
+Once this is complete you can run the AWS command to ensure it was installed properly
+
+285
+18:50.867 --> 18:54.432
+we should see the help screen when typing AWS.
+
+286
+18:54.433 --> 18:59.566
+Now we are ready to configure AWS
+
+287
+18:59.567 --> 19:01.899
+with the security credentials we created earlier
+
+288
+19:01.900 --> 19:06.399
+so it can connect to AWS's API on our behalf.
+
+289
+19:06.400 --> 19:10.332
+Kops will use the AWS command line tool
+
+290
+19:10.333 --> 19:13.499
+and we will directly use the AWS command line tool
+
+291
+19:13.500 --> 19:15.732
+to provision and configure resource
+
+292
+19:15.733 --> 19:17.499
+to create a Kubernetes cluster.
+
+293
+19:17.500 --> 19:20.032
+So it needs to know how to access our account.
+
+294
+19:20.033 --> 19:23.766
+Let's type AWS space configure.
+
+295
+19:23.767 --> 19:31.299
+At this point AWS is asking for the security information,
+
+296
+19:31.300 --> 19:32.632
+which we previously created.
+
+297
+19:32.633 --> 19:36.366
+It's asking for the AWS access key ID.
+
+298
+19:36.367 --> 19:39.832
+Remember when you created this earlier in the lecture.
+
+299
+19:39.833 --> 19:46.999
+Cut and paste or type in the access key identically from that earlier step.
+
+300
+19:47.000 --> 19:55.999
+Once you're sure that's the proper value press enter.
+
+301
+19:56.000 --> 19:59.999
+Now let's enter our secret access key.
+
+302
+20:00.000 --> 20:07.132
+Remember these values give full access to your AWS account.
+
+303
+20:07.133 --> 20:08.166
+Keep them secure.
+
+304
+20:08.167 --> 20:11.666
+Not like I'm doing here and publishing them for the world to see.
+
+305
+20:11.667 --> 20:15.166
+These credential were simply created as an example
+
+306
+20:15.167 --> 20:16.499
+and have been disabled.
+
+307
+20:16.500 --> 20:21.499
+Now it's asking for a default region name.
+
+308
+20:21.500 --> 20:23.299
+This is important to consider.
+
+309
+20:23.300 --> 20:26.766
+As we've talked about in creating redundant system.
+
+310
+20:26.767 --> 20:30.332
+Where  you create your resources matters.
+
+311
+20:30.333 --> 20:35.766
+Different regions provide different isolation levels.
+
+312
+20:35.767 --> 20:39.299
+Creating a server in one region and another region
+
+313
+20:39.300 --> 20:45.066
+hopefully let both server immune from any one event
+
+314
+20:45.067 --> 20:47.299
+which might take them down like a power outage
+
+315
+20:47.300 --> 20:49.199
+or loss or network connectivity.
+
+316
+20:49.200 --> 20:53.999
+AWS provides a variety of regions all across the world.
+
+317
+20:54.000 --> 21:01.132
+For a full listing of these, you could consult Google by looking at, or searching for,
+
+318
+21:01.133 --> 21:04.699
+AWS regions  and availability.
+
+319
+21:04.700 --> 21:12.232
+Looking at the regions and availability zones document
+
+320
+21:12.233 --> 21:15.699
+you should be able to choose one, which is optimal for your needs.
+
+321
+21:15.700 --> 21:19.166
+Remember region and availability
+
+322
+21:19.167 --> 21:20.799
+vary service by service.
+
+323
+21:20.800 --> 21:24.632
+In this case the first Google hit refers to the relational database service.
+
+324
+21:24.633 --> 21:29.866
+This just gives you an idea what region strings are available.
+
+325
+21:29.867 --> 21:36.299
+The one nearest to me happens to be the US-West-1 region.
+
+326
+21:36.300 --> 21:39.599
+However remember pricing may vary region by region.
+
+327
+21:39.600 --> 21:42.366
+So in making your decision consults the pricing tables
+
+328
+21:42.367 --> 21:45.599
+to ensure that you choose a region near you
+
+329
+21:45.600 --> 21:47.366
+that fits your cost needs.
+
+330
+21:47.367 --> 21:52.866
+US-West-1 is a little bit more expensive so I'm going to choose US-West-2.
+
+331
+21:52.867 --> 22:02.466
+You can always choose a different region when you're issuing command.
+
+332
+22:02.467 --> 22:05.299
+This is simply the default if you don't specify one.
+
+333
+22:05.300 --> 22:10.432
+We don't need to specify an output format.
+
+334
+22:10.433 --> 22:14.132
+AWS should now be configured.
+
+335
+22:14.133 --> 22:19.232
+Now that kops and aws are installed,
+
+336
+22:19.233 --> 22:21.332
+let's create an AWS bucket
+
+337
+22:21.333 --> 22:23.166
+that we can use as a state store.
+
+338
+22:23.167 --> 22:26.966
+A state store is simply where information about our cluster
+
+339
+22:26.967 --> 22:30.232
+that kops needs to be able operate is stored.
+
+340
+22:30.233 --> 22:35.166
+S3 again is an object store it allows us to create files,
+
+341
+22:35.167 --> 22:37.332
+store them in a bucket in the cloud
+
+342
+22:37.333 --> 22:40.599
+and have anyone who have access to those resources
+
+343
+22:40.600 --> 22:46.466
+write and read in a reliability consistent fashion from anywhere that has internet connectivity
+
+344
+22:46.467 --> 22:47.899
+that we've allowed to do that.
+
+345
+22:47.900 --> 22:53.366
+There are many way to create an S3 bucket.
+
+346
+22:53.367 --> 22:57.399
+But the most convenient is to use the AWS command line tool,
+
+347
+22:57.400 --> 23:00.166
+you could also use the web interface,
+
+348
+23:00.167 --> 23:01.566
+which is also convenient.
+
+349
+23:01.567 --> 23:04.132
+However we'll use the command line tool
+
+350
+23:04.133 --> 23:09.132
+to make sure that we keep everything in one place
+
+351
+23:09.133 --> 23:11.932
+and are able to simple do everything from a command line.
+
+352
+23:11.933 --> 23:14.132
+We'll type AWS,
+
+353
+23:14.133 --> 23:15.632
+which is the toolset we’ve just configured,
+
+354
+23:15.633 --> 23:19.099
+and we'll type S3api as the next parameter
+
+355
+23:19.100 --> 23:21.532
+to indicate we'd like to access the S3 API.
+
+356
+23:21.533 --> 23:23.899
+Then we are going to type create-bucket
+
+357
+23:23.900 --> 23:25.699
+because that's the command we'd like to issue.
+
+358
+23:25.700 --> 23:29.966
+Next we'll use the --bucket flag
+
+359
+23:29.967 --> 23:31.432
+to indicate the name of the bucket.
+
+360
+23:31.433 --> 23:33.866
+Bucket name must be globally unique
+
+361
+23:33.867 --> 23:38.699
+that means if any one has already chosen a bucket name you're trying to use it will fail.
+
+362
+23:38.700 --> 23:44.032
+A good rule of thumb is to ensure that you use your name,
+
+363
+23:44.033 --> 23:46.366
+your organization's name or something highly unique
+
+364
+23:46.367 --> 23:47.632
+when creating bucket names.
+
+365
+23:47.633 --> 23:51.366
+This will be globally viewable.
+
+366
+23:51.367 --> 23:54.466
+So don't use anything you'd like to keep secure
+
+367
+23:54.467 --> 23:56.299
+or something that might be embarrassing.
+
+368
+23:56.300 --> 24:04.032
+I'll use basit-kas-demo-bucket for mine.
+
+369
+24:04.033 --> 24:06.532
+Let's specify a region
+
+370
+24:06.533 --> 24:08.532
+using the dash dash region flag.
+
+371
+24:08.533 --> 24:12.666
+You can use whatever you like but to keep it consistent.
+
+372
+24:12.667 --> 24:17.132
+Let's just use the one that we had used earlier when we were specifying and configuring
+
+373
+24:17.133 --> 24:19.199
+the AWS command line tools.
+
+374
+24:19.200 --> 24:22.099
+I use US-west-2.
+
+375
+24:22.100 --> 24:29.099
+Then we have to provide a create bucket configuration item
+
+376
+24:29.100 --> 24:32.732
+which further indicates this location constraint.
+
+377
+24:32.733 --> 24:38.032
+Using the LocationConstraint option = the name of the bucket
+
+378
+24:38.033 --> 24:41.499
+again or the name of the region in which you are creating the bucket again.
+
+379
+24:41.500 --> 24:48.966
+Press enter, this may take a moment,
+
+380
+24:48.967 --> 24:50.566
+the bucket is being created.
+
+381
+24:50.567 --> 24:55.766
+You can see that the output indicates that the location of our bucket
+
+382
+24:55.767 --> 25:00.932
+is a URL with a bucket name .S3.AmazonAWS.com
+
+383
+25:00.933 --> 25:03.632
+This indicates successful creation of the bucket.
+
+384
+25:03.633 --> 25:07.066
+You may get a user  message or an error message,
+
+385
+25:07.067 --> 25:09.199
+which indicates your name, is already taken,
+
+386
+25:09.200 --> 25:15.832
+if so change your name and try again until you see successful completion like this.
+
+387
+25:15.833 --> 25:19.466
+Our bucket has now been created.
+
+388
+25:19.467 --> 25:23.732
+Now that we have a groundwork laid
+
+389
+25:23.733 --> 25:27.132
+with kops installed AWS working and a bucket created
+
+390
+25:27.133 --> 25:30.032
+to store for information about the cluster we're about create,
+
+391
+25:30.033 --> 25:32.799
+let’s actually create the cluster using kops.
+
+392
+25:32.800 --> 25:38.366
+Now that we have a state store created
+
+393
+25:38.367 --> 25:41.999
+where kops can store critical information about our cluster in S3
+
+394
+25:42.000 --> 25:45.366
+and globally available highly reliable storage service.
+
+395
+25:45.367 --> 25:47.532
+We can now create a cluster.
+
+396
+25:47.533 --> 25:50.366
+The first step in doing that
+
+397
+25:50.367 --> 25:54.032
+is making sure the kops knows where the state store is.
+
+398
+25:54.033 --> 25:56.099
+We'll set an environment variable
+
+399
+25:56.100 --> 25:58.599
+where the kops tools expected it to be.
+
+400
+25:58.600 --> 26:04.066
+To do this let’s type export in all capitals
+
+401
+26:04.067 --> 26:14.899
+KOPS_STATE_STORE=S3:// and the name of the bucket that you created.
+
+402
+26:14.900 --> 26:17.532
+We only want to copy the name of the bucket
+
+403
+26:17.533 --> 26:19.432
+and nothing else in that URL.
+
+404
+26:19.433 --> 26:25.899
+Press enter and the environment variable is set.
+
+405
+26:25.900 --> 26:30.599
+Now we can use the kops tools to create a cluster.
+
+406
+26:30.600 --> 26:35.499
+We will type kops create cluster
+
+407
+26:35.500 --> 26:37.632
+relatively obvious command
+
+408
+26:37.633 --> 26:39.132
+and then we will provide the name of the cluster.
+
+409
+26:39.133 --> 26:44.532
+This doesn’t have to be unique globally only unique within your AWS account.
+
+410
+26:44.533 --> 26:53.399
+I’ll choose basit–demo.k8s.local.
+
+411
+26:53.400 --> 26:57.066
+Next we'll provide the --zone flag.
+
+412
+26:57.067 --> 27:05.699
+Choose the zone and the region that you'd have already chosen for your S3 bucket and is your default.
+
+413
+27:05.700 --> 27:10.999
+We'll type US–West–2.
+
+414
+27:11.000 --> 27:15.199
+But because this is a zone and not a region,
+
+415
+27:15.200 --> 27:19.332
+we have to provide a letter after it.
+
+416
+27:19.333 --> 27:24.699
+Within all AWS regions are separate zones.
+
+417
+27:24.700 --> 27:29.366
+These are simply you can think of them as separate data centers within a given zone.
+
+418
+27:29.367 --> 27:37.666
+They provide fault tolerance and isolation of power,
+
+419
+27:37.667 --> 27:43.499
+network and other aspects of availability.
+
+420
+27:43.500 --> 27:50.366
+Each zone has a variety and a different number of availability zones.
+
+421
+27:50.367 --> 27:56.799
+They start with the letter A and run through however many are set up in that given region.
+
+422
+27:56.800 --> 28:00.499
+You can consult the documentation which we looked at earlier
+
+423
+28:00.500 --> 28:04.899
+to see how many availability zones exist in your given region.
+
+424
+28:04.900 --> 28:09.666
+However it’s a safe bet that an "A" exist in nearly every region.
+
+425
+28:09.667 --> 28:12.332
+So let’s just go ahead and choose "A".
+
+426
+28:12.333 --> 28:18.866
+We’ll specify it with the --yes flag.
+
+427
+28:18.867 --> 28:23.699
+This way it won't prompt us to create resources every single time.
+
+428
+28:23.700 --> 28:26.432
+Let’s press enter to get going.
+
+429
+28:26.433 --> 28:31.999
+This will take a moment quite a few things are going on here.
+
+430
+28:32.000 --> 28:36.399
+Kops is using the AWS command line.
+
+431
+28:36.400 --> 28:43.899
+If your SSH configuration error occurs
+
+432
+28:43.900 --> 28:48.466
+this is normal and may happened in certain situations.
+
+433
+28:48.467 --> 28:51.932
+If you receive an error like this…
+
+434
+28:51.933 --> 29:00.466
+it simply means that you don’t have a public key created by default.
+
+435
+29:00.467 --> 29:05.166
+We'll use the ssh-keygen command to create one.
+
+436
+29:05.167 --> 29:11.699
+Type ssh-keygen press enter
+
+437
+29:11.700 --> 29:13.666
+and let's just accept the defaults by pressing enter.
+
+438
+29:13.667 --> 29:17.632
+Let's try the command again.
+
+439
+29:17.633 --> 29:27.299
+We can see with a public key created everything is alright.
+
+440
+29:27.300 --> 29:30.632
+You may or may not have error, if you already had a public key created.
+
+441
+29:30.633 --> 29:40.932
+This is creating a variety of resources on Amazon AWS in our account.
+
+442
+29:40.933 --> 29:44.199
+From here on out charges will begin to accrue.
+
+443
+29:44.200 --> 29:52.232
+This will take a moment and you can watch each individual step.
+
+444
+29:52.233 --> 29:57.266
+Basically what's occurring is that the cluster is creating a variety of resources
+
+445
+29:57.267 --> 30:01.166
+including machines, masters and workers and networking them together.
+
+446
+30:01.167 --> 30:08.899
+Once it's complete you can see that kops has created the cluster,
+
+447
+30:08.900 --> 30:10.932
+it will take a few minutes to get ready.
+
+448
+30:10.933 --> 30:16.499
+It gives some suggestions and we'll follow each of those.
+
+449
+30:16.500 --> 30:19.832
+But let's give it a minute for resources to come up.
+
+450
+30:19.833 --> 30:31.299
+It's worth knowing that kops has automatically switch the Kubectl configurationon our machine.
+
+451
+30:31.300 --> 30:37.332
+If we type kubectl we will no longer be accessing the minikube, which is running on our machine.
+
+452
+30:37.333 --> 30:43.999
+Instead kubectl has now being bound to the cluster on AWS.
+
+453
+30:44.000 --> 30:55.799
+Any command issue to kubectl will now run against our cluster that has been created.
+
+454
+30:55.800 --> 30:57.432
+Not the minikube.
+
+455
+30:57.433 --> 31:07.999
+After waiting a few moments let's type the kops validate cluster command.
+
+456
+31:08.000 --> 31:09.066
+It's first suggestion.
+
+457
+31:09.067 --> 31:19.166
+The last line seems like an error. Cannot get nodes.
+
+458
+31:19.167 --> 31:23.899
+This means that it is not quite done with the set up items.
+
+459
+31:23.900 --> 31:25.466
+Let's give it some more time.
+
+460
+31:25.467 --> 31:33.999
+We can keep reissuing the command about every minute or so.
+
+461
+31:34.000 --> 31:37.832
+In this case we see we have a little bit of progress.
+
+462
+31:37.833 --> 31:45.432
+The Master has come up. It's ready.
+
+463
+31:45.433 --> 31:50.632
+But the worker nodes don't seem to be ready.
+
+464
+31:50.633 --> 31:54.999
+Let's wait a moment more.
+
+465
+31:55.000 --> 32:06.566
+It seems like patience is not my virtue.
+
+466
+32:06.567 --> 32:11.332
+Running the command again now we have one node out of two is ready.
+
+467
+32:11.333 --> 32:12.766
+Progress.
+
+468
+32:12.767 --> 32:15.499
+But we are still not quite there.
+
+469
+32:15.500 --> 32:22.199
+Seems like third time is the charm.
+
+470
+32:22.200 --> 32:27.399
+You can see that our nodes are up and running.
+
+471
+32:27.400 --> 32:32.432
+Two worker nodes, a master and we have confirmation that the cluster is ready.
+
+472
+32:32.433 --> 32:36.366
+This may take up to five minutes or more
+
+473
+32:36.367 --> 32:38.432
+depending on how busy AWS is.
+
+474
+32:38.433 --> 32:51.332
+Now that our cluster is up and ready, let's have a look at the Master.
+
+475
+32:51.333 --> 32:58.266
+The kops validates command has already indicated
+
+476
+32:58.267 --> 33:00.632
+that Master is already running on this host.
+
+477
+33:00.633 --> 33:14.866
+But let's scroll up to the list of suggestions that kops gave us.
+
+478
+33:14.867 --> 33:18.299
+First was validate cluster.
+
+479
+33:18.300 --> 33:19.366
+We already did that.
+
+480
+33:19.367 --> 33:22.599
+Let's list the nodes.
+
+481
+33:22.600 --> 33:29.332
+The kubectl get nodes command is one that we've used before.
+
+482
+33:29.333 --> 33:30.699
+We should be familiar with it.
+
+483
+33:30.700 --> 33:32.132
+But let's look at the output anyway.
+
+484
+33:32.133 --> 33:39.132
+This gives us information about each of the nodes,
+
+485
+33:39.133 --> 33:44.832
+how old it is and a variety of information about the versions
+
+486
+33:44.833 --> 33:45.999
+and label assigned to it.
+
+487
+33:46.000 --> 33:52.732
+Let's go back up to the suggestions again.
+
+488
+33:52.733 --> 33:55.066
+Let's SSH into the Master.
+
+489
+33:55.067 --> 34:02.466
+Copying this command would give us direct access
+
+490
+34:02.467 --> 34:04.132
+to a shell on the Master.
+
+491
+34:04.133 --> 34:15.632
+However you'll notice that this doesn't work.
+
+492
+34:15.633 --> 34:21.199
+The reason is that since we are not logged in to a shell on AWS itself,
+
+493
+34:21.200 --> 34:23.599
+the domain name cannot be resolved.
+
+494
+34:23.600 --> 34:30.066
+Let's replace the domain name here with one that can be why any machine outside of AWS.
+
+495
+34:30.067 --> 34:36.732
+We'll use the Amazon AWS console to get the externally available hostname.
+
+496
+34:36.733 --> 34:46.632
+Go back to the management console,
+
+497
+34:46.633 --> 34:54.132
+or if you don’t have it opened just open the web browser to AWS.Amazon.com
+
+498
+34:54.133 --> 34:56.432
+and click sign in to the console.
+
+499
+34:56.433 --> 35:00.932
+Once you are at console,
+
+500
+35:00.933 --> 35:06.632
+in the any upper right hand corner ensure that the console is set to the proper region.
+
+501
+35:06.633 --> 35:11.966
+In our case since I chose US–West-2,
+
+502
+35:11.967 --> 35:15.599
+that corresponds to US West Oregon.
+
+503
+35:15.600 --> 35:18.766
+The console is in the appropriate zone,
+
+504
+35:18.767 --> 35:19.599
+that’s good.
+
+505
+35:19.600 --> 35:23.366
+Now let’s choose EC2
+
+506
+35:23.367 --> 35:29.432
+because we're looking at our servers are available as an EC2 service,
+
+507
+35:29.433 --> 35:49.766
+let’s click on instances in the left-hand corner
+
+508
+35:49.767 --> 35:53.866
+and let’s choose the Master
+
+509
+35:53.867 --> 35:55.066
+there should only be one.
+
+510
+35:55.067 --> 36:01.466
+Let's cut-and-paste the public DNS name,
+
+511
+36:01.467 --> 36:05.766
+the entire string starting with EC2 to an ending with.com.
+
+512
+36:05.767 --> 36:08.232
+Let’s take that to our clipboard
+
+513
+36:08.233 --> 36:13.999
+returning to the shell
+
+514
+36:14.000 --> 36:19.666
+let’s recall the previous command, which failed by pressing the up arrow.
+
+515
+36:19.667 --> 36:23.466
+Let’s delete everything before the @ sign.
+
+516
+36:23.467 --> 36:29.232
+And let’s paste in the hostname that we just copied.
+
+517
+36:29.233 --> 36:37.099
+It may ask you to verify the public key in which case you should type yes.
+
+518
+36:37.100 --> 36:40.232
+It may not if that public key is something that you’ve used before.
+
+519
+36:40.233 --> 36:46.299
+In our case it didn’t but if you’re asked to verify a public key entrusted type yes.
+
+520
+36:46.300 --> 36:50.832
+We’re now on a shell on the Master machine
+
+521
+36:50.833 --> 36:52.366
+the kops created for us.
+
+522
+36:52.367 --> 36:54.332
+We can do a few things here,
+
+523
+36:54.333 --> 36:58.232
+first let’s type ps space ax.
+
+524
+36:58.233 --> 37:00.232
+You maybe familiar with this command,
+
+525
+37:00.233 --> 37:03.232
+it was a process listing of everything that's running on this machine.
+
+526
+37:03.233 --> 37:06.832
+There’s a variety of processes running.
+
+527
+37:06.833 --> 37:11.399
+Docker is running the Kube-scheduler.
+
+528
+37:11.400 --> 37:16.199
+You can see at etcd is running;
+
+529
+37:16.200 --> 37:19.832
+you can see the Kube-controller-manager is running.
+
+530
+37:19.833 --> 37:28.266
+All of these services are running as processes on this Master machine,
+
+531
+37:28.267 --> 37:29.432
+as we would expect.
+
+532
+37:29.433 --> 37:31.699
+You can see Kubelet is running.
+
+533
+37:31.700 --> 37:38.266
+All of the services were set up properly by the kops system.
+
+534
+37:38.267 --> 37:43.466
+We didn’t have to do them by hand but we can go and look at them as we need to.
+
+535
+37:43.467 --> 37:50.332
+You can see that etcd is being logged  /var/log/etcd.
+
+536
+37:50.333 --> 37:56.632
+Kube-scheduler is being logged to Kube-schedule.log.
+
+537
+37:56.633 --> 38:00.466
+Let's go look at our log directory.
+
+538
+38:00.467 --> 38:07.699
+You can see that the logs are available on file system,
+
+539
+38:07.700 --> 38:08.599
+if we'd like look at them.
+
+540
+38:08.600 --> 38:16.999
+Let’s have a look at the Kube-api-server.log.
+
+541
+38:17.000 --> 38:21.632
+You can see we don’t have permissions.
+
+542
+38:21.633 --> 38:23.366
+Let’s use sudo.
+
+543
+38:23.367 --> 38:32.932
+This is the output from the Kube-api server
+
+544
+38:32.933 --> 38:34.332
+since it's run.
+
+545
+38:34.333 --> 38:37.632
+There’s quite a bit here.
+
+546
+38:37.633 --> 38:41.866
+Now that we’ve seen the actual processes running our machine
+
+547
+38:41.867 --> 38:43.599
+and examine some of the log output.
+
+548
+38:43.600 --> 38:45.299
+Let’s look at how they’re running.
+
+549
+38:45.300 --> 38:47.232
+They are running as Docker containers.
+
+550
+38:47.233 --> 38:53.399
+Let's use the sudo docker command to look at what containers are running on our system.
+
+551
+38:53.400 --> 39:00.466
+We'll type sudo docker space ps.
+
+552
+39:00.467 --> 39:06.299
+This will give us a listing of every single docker container running under our Master.
+
+553
+39:06.300 --> 39:07.832
+There are quite a few.
+
+554
+39:07.833 --> 39:12.899
+Much like we saw in the ps command.
+
+555
+39:12.900 --> 39:19.932
+We can see kube-proxy running. Kube-api-server, etcd, controller-manager.
+
+556
+39:19.933 --> 39:22.966
+These are all individual docker containers,
+
+557
+39:22.967 --> 39:26.066
+which comprise a variety of Kubernetes processes.
+
+558
+39:26.067 --> 39:31.166
+These docker containers are started and run by Kubernetes on our Master
+
+559
+39:31.167 --> 39:32.666
+and we don’t have to worry about them,
+
+560
+39:32.667 --> 39:36.066
+this just gives us an inside look into the internals of our Master.
+
+561
+39:36.067 --> 39:42.366
+We'll type exit to logout.
+
+562
+39:42.367 --> 39:46.599
+And now we've disconnected from our Master.
+
+563
+39:46.600 --> 39:53.866
+Next let's use kubectl to look at a few other items.
+
+564
+39:53.867 --> 40:00.766
+The first command we'll issue is kubectl get deployments
+
+565
+40:00.767 --> 40:08.832
+but let's provide the dash dash namespace = Kube–system flag.
+
+566
+40:08.833 --> 40:13.532
+So we can look at services running in the Kuber system namespace.
+
+567
+40:13.533 --> 40:20.666
+You can see the DNS, the DNS auto scaler and the DNS controller are also running.
+
+568
+40:20.667 --> 40:22.899
+These were running on our Master as well.
+
+569
+40:22.900 --> 40:29.032
+Feel free to explore more using the shell of the Master.
+
+570
+40:29.033 --> 40:32.732
+You can look at logs and you can look at what processes are running.
+
+571
+40:32.733 --> 40:37.866
+It’s not important necessarily to understand the intricacies of each process,
+
+572
+40:37.867 --> 40:41.299
+those are managed by kops and by Kubernetes for you.
+
+573
+40:41.300 --> 40:47.132
+The whole point is Kubernetes provides transparent management of those underlying processes.
+
+574
+40:47.133 --> 40:53.632
+The key idea is just to know that they’re running, where they're running so you can be a more effective user of them.
+
+575
+40:53.633 --> 40:58.766
+You don’t have to understand the log output, you don't even have to understand individual processes.
+
+576
+40:58.767 --> 41:00.899
+Those are managed for you by Kubernetes.
+
+577
+41:00.900 --> 41:04.799
+The point of looking at these and logging into the machine
+
+578
+41:04.800 --> 41:08.399
+is not to master them but to know simply that they exist
+
+579
+41:08.400 --> 41:10.699
+and how to set up managed.
+
+580
+41:10.700 --> 41:14.999
+Hopefully unless you become a Kubernetes System Engineer
+
+581
+41:15.000 --> 41:17.732
+you’ll never have access them directly as we have today.
+
+582
+41:17.733 --> 41:21.866
+But hopefully it gives you an understanding of what's going on the Master;
+
+583
+41:21.867 --> 41:28.266
+where it exists and having touched it - it now exists as a real fractal component
+
+584
+41:28.267 --> 41:31.432
+and not something as if you’re had out of black box.
+
+585
+41:31.433 --> 41:37.366
+Because in future lectures we'll work on setting up multiple Masters using the kops tools.
+
+586
+41:37.367 --> 41:40.866
+Now that we have looked at our Master,
+
+587
+41:40.867 --> 41:42.699
+let’s make sure that we stop our cluster.
+
+588
+41:42.700 --> 41:46.466
+You’re more than welcome to leave the cluster running,
+
+589
+41:46.467 --> 41:49.299
+if you’d like to examine it further or play with it
+
+590
+41:49.300 --> 41:51.632
+just remember you’re paying for these resources.
+
+591
+41:51.633 --> 41:54.266
+We’ll use kops to delete the cluster.
+
+592
+41:54.267 --> 41:59.866
+This should release all resources and terminate the billing.
+
+593
+41:59.867 --> 42:03.899
+However bugs are present in all versions of software
+
+594
+42:03.900 --> 42:06.066
+and we don’t have control over kops.
+
+595
+42:06.067 --> 42:12.432
+To be completely safe close AWS account you created to ensure all resources are released and your not charged
+
+596
+42:12.433 --> 42:18.666
+or wait until after you’ve completed these lecture series to do so if you’d like to follow along the following lectures.
+
+597
+42:18.667 --> 42:22.899
+Regardless make sure that you’re not accruing charges
+
+598
+42:22.900 --> 42:28.866
+that you’re unaware of or that you’re not like to accrue by stopping the cluster at this point
+
+599
+42:28.867 --> 42:32.232
+because all AWS resources are billed on usage
+
+600
+42:32.233 --> 42:34.532
+which includes how long the running for some of them.
+
+601
+42:34.533 --> 42:41.366
+Using kops to delete the cluster is simple.
+
+602
+42:41.367 --> 42:49.366
+We'll type kops delete cluster
+
+603
+42:49.367 --> 42:51.732
+and we’ll give it the name of our cluster.
+
+604
+42:51.733 --> 43:06.666
+And we'll specified  --yes command so it doesn’t keep prompting us.
+
+605
+43:06.667 --> 43:15.332
+This may take a moment as it communicates with the API.
+
+606
+43:15.333 --> 43:22.632
+If you receive an error that your cluster was not found
+
+607
+43:22.633 --> 43:30.399
+check the name if you're sure the name is correct try appending .kas.local to the end
+
+608
+43:30.400 --> 43:33.099
+to ensure you have fully qualified name.
+
+609
+43:33.100 --> 43:44.199
+You'll see it’s going through iterating through resources and deleting them as appropriate.
+
+610
+43:44.200 --> 43:47.332
+This may take a moment.
+
+611
+43:47.333 --> 43:57.866
+If everything was deleted appropriately the last line should be that the cluster was deleted.
+
+612
+43:57.867 --> 43:59.766
+Deleted cluster with the name.
+
+613
+43:59.767 --> 44:04.766
+Again bugs make exist in the software,
+
+614
+44:04.767 --> 44:08.499
+which leaves AWS resources still running.
+
+615
+44:08.500 --> 44:11.699
+To be sure to avoid new further charges
+
+616
+44:11.700 --> 44:19.732
+close your AWS account or look at the billing status in AWS
+
+617
+44:19.733 --> 44:22.400
+to ensure no further billing is accrued.

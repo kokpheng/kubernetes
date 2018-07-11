@@ -1,0 +1,820 @@
+WEBVTT
+
+0
+00:06.433 --> 00:10.632
+在本系列前面的讲座中，我们研究了如何创建卷。
+
+1
+00:10.633 --> 00:15.832
+to persistently store data used in or created by applications running on our cluster.
+来持久存储在集群上运行的应用程序中使用或创建的数据。
+
+2
+00:15.833 --> 00:21.966
+You may recall that this involvement deployments using something called persistent volume claims
+您可能还记得，这种参与部署使用称为持久卷声明的东西
+
+3
+00:21.967 --> 00:26.666
+to ask the Kubernetes control plane for something called a persistent volume
+以要求Kubernetes控制面板获得一种称为持久卷的东西
+
+4
+00:26.667 --> 00:30.466
+that functions like a persistent disk in physical computers systems.
+它的功能类似于物理计算机系统中的持久磁盘。
+
+5
+00:30.467 --> 00:33.932
+In those demonstration we were responsible for
+在这些演示中，我们负责
+
+6
+00:33.933 --> 00:38.099
+explicitly creating a persistent volume and defining it
+显式地创建持久卷并定义它
+
+7
+00:38.100 --> 00:41.932
+so that Kubernetes could fulfill these persistent volume claims
+以便Kubernetes能够在部署
+
+8
+00:41.933 --> 00:45.099
+when we deploy MySQL and WordPress.
+MySQL和WordPress时完成这些持久卷声明。
+
+9
+00:45.100 --> 00:48.566
+Now that we have a cluster running on AWS.
+现在我们有了一个在AWS上运行的集群。
+
+10
+00:48.567 --> 00:53.132
+We have a chance to explore a useful function of Kubernetes
+我们有机会探索Kubernetes
+
+11
+00:53.133 --> 00:56.132
+auto provisioning of volumes.
+自动提供卷的有用功能。
+
+12
+00:56.133 --> 01:02.732
+This feature isn’t specific to AWS but Kubernetes does support it on AWS.
+这个特性并不是AWS特有的，但是Kubernetes在AWS上确实支持它。
+
+13
+01:02.733 --> 01:08.132
+First let’s explore auto provisioning of volumes in general
+首先，让我们从整体上探讨一下卷的自动配置
+
+14
+01:08.133 --> 01:09.566
+and why it’s interesting.
+以及为什么它很有趣。
+
+15
+01:09.567 --> 01:17.899
+When creating a volume and a persistent volume claim,
+在创建卷和持久卷声明时
+
+16
+01:17.900 --> 01:21.032
+you define certain things about each.
+您定义了它们当中的某些内容。
+
+17
+01:21.033 --> 01:25.766
+You will recall that we created 10 GB volumes,
+您可能还记得，我们创建了10 GB的卷，
+
+18
+01:25.767 --> 01:31.232
+so that in our MySQL and WordPress deployments
+因此在我们的MySQL和WordPress部署中
+
+19
+01:31.233 --> 01:35.332
+we had a 10 GB persistent disk attached to each.
+每个卷都有一个10 GB的持久磁盘。
+
+20
+01:35.333 --> 01:39.932
+We first created the volume and then we created the persistent volume claim.
+我们首先创建卷，然后再创建持久卷声明。
+
+21
+01:39.933 --> 01:44.999
+When an existing volume doesn’t match a claim in Kubernetes
+当现有的卷与Kubernetes中的声明不匹配时
+
+22
+01:45.000 --> 01:48.899
+the dynamic provisioning system of Kubernetes
+Kubernetes的动态供应系统
+
+23
+01:48.900 --> 01:53.966
+means that it maybe able to based on the provider type configuration
+意味着它可能能够基于提供者类型配置
+
+24
+01:53.967 --> 01:58.866
+in which your cluster is running provision volumes to fulfill the claim on its own.
+在这个配置中，您的集群正在运行提供卷，以完成自身提出的请求。
+
+25
+01:58.867 --> 02:03.799
+Depending on the underlying implementation’s ability to create new volumes,
+取决于底层实现创建新卷的能力，
+
+26
+02:03.800 --> 02:07.499
+things like available space, appropriate permissions etc.
+比如可用空间、适当的权限等等。
+
+27
+02:07.500 --> 02:13.832
+it may be able to automatically creative a volume to fulfill a claim at runtime.
+它可以自动创建一个卷，以在运行时完成一个声明。
+
+28
+02:13.833 --> 02:19.032
+A good example of this if the underlying system is a cloud provider
+这是一个很好的例子，如果底层系统是一个云提供商
+
+29
+02:19.033 --> 02:23.599
+with enough quota and access levels Kubernetes may be able to create new volumes.
+有足够的配额和访问级别，Kubernetes可能能够创建新的卷。
+
+30
+02:23.600 --> 02:30.499
+One good example that we’ll explore here is the Elastic Block store services
+我们将在这里探讨的一个很好的例子是
+
+31
+02:30.500 --> 02:32.032
+on Amazon Web services.
+亚马逊网路服务系统上的弹性块存储服务。
+
+32
+02:32.033 --> 02:34.566
+We’ll discuss it in a second.
+我们过一会儿再针对这点进行讨论。
+
+33
+02:34.567 --> 02:38.632
+An example where dynamic provisioning may not work
+动态配置可能无法工作的一个例子是
+
+34
+02:38.633 --> 02:43.532
+is that if the underlying file system is a SAN (or storage area network) file system
+如果底层文件系统是SAN(或存储区域网络)文件系统
+
+35
+02:43.533 --> 02:47.866
+and there simply is no more free space on the disks that make up the SAN.
+而组成SAN的磁盘上根本没有空闲空间。
+
+36
+02:47.867 --> 02:50.832
+Kubernetes would not be able to create a new volume.
+Kubernetes将无法创建新的卷。
+
+37
+02:50.833 --> 02:56.632
+It can’t order and install more physical disks on its own yet.
+它还不能自行命令和安装更多的物理磁盘。
+
+38
+02:56.633 --> 03:01.232
+However on something like Amazon Web Services
+然而，在像亚马逊网路服务系统中
+
+39
+03:01.233 --> 03:06.399
+where the Elastic Block Store or EBS offering
+弹性块存储或EBS
+
+40
+03:06.400 --> 03:10.466
+offers essentially unlimited disk space to the user
+提供给用户的磁盘空间基本上是无限的
+
+41
+03:10.467 --> 03:13.432
+where a user doesn't have to physically order a new disk
+用户不必实际订购新磁盘
+
+42
+03:13.433 --> 03:22.166
+Kubernetes provides a facility that can use and even dynamically prove provision volumes on EBS
+Kubernetes提供了一种工具，可以使用甚至动态地证明EBS上的提供卷
+
+43
+03:22.167 --> 03:25.999
+to match only persistent volume claims made by pods.
+以匹配PODS提出的持久卷声明。
+
+44
+03:26.000 --> 03:28.666
+As long as your Amazon account is valid
+只要您的Amazon帐户是有效的
+
+45
+03:28.667 --> 03:31.699
+and you’re not limited buy an EBS quota,
+并且您可不受限制的购买EBS配额，
+
+46
+03:31.700 --> 03:38.566
+Kubernetes should be able to automatically provision volumes to match persistent volume claims.
+Kubernetes就应该能够自动提供卷以匹配持久卷声明。
+
+47
+03:38.567 --> 03:41.766
+Let's explore how this works.
+让我们来探讨一下它是如何工作的。
+
+48
+03:41.767 --> 03:45.966
+We’ll use our existing MySQL and WordPress deployment
+在上一节课中，我们将使用我们在AWS上的Kubernetes集群上
+
+49
+03:45.967 --> 03:50.766
+that we set up on our Kubernetes cluster on AWS in the previous lecture.
+设置的现有MySQL和WordPress的部署。
+
+50
+03:50.767 --> 03:56.566
+We'll edit it to include persistent volume claims
+我们将对其进行编辑，以包含持久卷声明
+
+51
+03:56.567 --> 04:03.532
+to mount a volume at the point where it’s expected in our MySQL and WordPress deployments
+以便将卷挂载到MySQL和WordPress部署中预期的位置
+
+52
+04:03.533 --> 04:07.066
+just like we did several lectures ago on her minikube
+就像我们前几个讲座中在她的minikube上所做的一样
+
+53
+04:07.067 --> 04:10.232
+but this time we'll do it on Amazon AWS.
+但这一次我们将在Amazon AWS上这样做。
+
+54
+04:10.233 --> 04:16.099
+This time around however we won’t create the persistent volumes,
+这一次，我们不会创建持久卷
+
+55
+04:16.100 --> 04:18.966
+we’ll leave that up to dynamic provisioning.
+而是等到谈到动态卷供给时才会这样做。
+
+56
+04:18.967 --> 04:21.599
+We'll only create persistent volume claims
+我们将只创建持久卷声明，
+
+57
+04:21.600 --> 04:28.432
+and we’ll see in action dynamic provision create EBS volumes for us
+并且我们将看到在实际操作中动态配置如何为我们创建EBS卷
+
+58
+04:28.433 --> 04:31.032
+and binds them to claim successfully.
+并将它们与请求成功绑定。
+
+59
+04:31.033 --> 04:32.899
+Let’s take a look.
+让我们来看一看。
+
+60
+04:32.900 --> 04:37.499
+We’ll need a clean cluster to get started.
+我们需要一个干净的集群以开始。
+
+61
+04:37.500 --> 04:39.366
+If you already have one running
+如果您已经有一个在运行，
+
+62
+04:39.367 --> 04:43.199
+you can use the Kubectl delete deployments commands
+您现在可以使用Kubectl删除部署命令
+
+63
+04:43.200 --> 04:46.566
+to delete the existing WordPress and MySQL deployments.
+来删除现有的WordPress和MySQL部署。
+
+64
+04:46.567 --> 04:50.066
+This is if you didn’t delete the cluster at the end of last lecture.
+如果你在上节课结束后到现在都还没有删除这个集群的话。
+
+65
+04:50.067 --> 04:58.399
+You'll need to run to delete deployment command for the WordPress–MySQL deployment
+您需要运行以删除WordPress-MySQL部署
+
+66
+04:58.400 --> 05:03.266
+and the WordPress deployment.
+和WordPress部署的部署命令。
+
+67
+05:03.267 --> 05:06.799
+Make sure to press enter after each of these commands
+确保在这些命令中的每个命令之后按回车键
+
+68
+05:06.800 --> 05:11.599
+I’m just providing a demonstration of them here as my cluster doesn’t have them running at the moment.
+我只是在这里提供它们的演示，因为在我的集群里现在没有运行它们。
+
+69
+05:11.600 --> 05:14.632
+You did delete the cluster,
+您确实删除了集群，
+
+70
+05:14.633 --> 05:17.832
+you can use the kops create command as we have in the past
+您可以像过去一样使用kops创建命令
+
+71
+05:17.833 --> 05:19.132
+to create a new cluster.
+来创建一个新集群。
+
+72
+05:19.133 --> 05:26.999
+Remember use the export KOPS_STATE_STORE command first
+请记住，首先使用 KOPS_STATE_STORE命令
+
+73
+05:27.000 --> 05:33.332
+to make sure that your kops state store environment variable is properly set.
+以确保正确设置了kops状态存储环境变量。
+
+74
+05:33.333 --> 05:39.532
+You've done this in the past the command will be exactly the same this time around.
+你曾这么做过，这次的命令与以前所做的是完全一样的。
+
+75
+05:39.533 --> 05:45.199
+We'll export the state store
+我们将导出状态存储
+
+76
+05:45.200 --> 05:51.632
+then we’ll use the kops great cluster to create a small cluster.
+然后使用kops大集群创建一个小集群。
+
+77
+05:51.633 --> 05:59.732
+Remember this will take moment and will use the kops validate commands
+请记住，这需要一点时间，之后我们将使用kops验证命令
+
+78
+05:59.733 --> 06:02.932
+to make sure that we check the state of our cluster
+来确保并检查集群的状态
+
+79
+06:02.933 --> 06:06.032
+and that’s ready for us to begin using it.
+这样一来我们就可以开始使用它了。
+
+80
+06:06.033 --> 06:27.832
+It looks like things aren’t quite ready but they’re progressing.
+看起来事情虽然还没有完全准备好，但已经取得进展。
+
+81
+06:27.833 --> 06:28.999
+let’s give it another moment.
+请再耐心等会儿。
+
+82
+06:29.000 --> 06:38.566
+Running cluster command again we can see that the clusters ready.
+再次运行集群命令，这时我们可以看到集群已准备好了。
+
+83
+06:38.567 --> 06:41.066
+Whether we delete deployments or created a new cluster
+无论是删除部署还是创建一个新集群
+
+84
+06:41.067 --> 06:46.199
+we’re now ready to demonstrate and walk-through auto provisioning of volumes.
+我们现在都已经可以演示并逐步实现卷的自动配置。
+
+85
+06:46.200 --> 06:54.332
+To do this we’ll use the files that are in the GitHub repository for this lecture series.
+为此，我们将使用本系列讲座的GitHub存储库中的文件。
+
+86
+06:54.333 --> 07:03.166
+These files are identical to the files that are used earlier to deploy WordPress and MySQL using volumes,
+这些文件与先前使用卷部署WordPress和MySQL时使用的文件是相同的，
+
+87
+07:03.167 --> 07:07.332
+with one omission we’re not going to create the volumes ourselves.
+只有一点遗漏-就是我们不打算自己创建卷。
+
+88
+07:07.333 --> 07:12.199
+The volumes will be created by the auto provisioner.
+卷将由自动提供程序创建。
+
+89
+07:12.200 --> 07:18.332
+In the earlier volumes lecture we manually create a persistent volumes.
+在前面有关卷的讲座中，我们手动创建了一个持久卷。
+
+90
+07:18.333 --> 07:20.132
+We simply won’t do that.
+所以这次我们不会再重复。
+
+91
+07:20.133 --> 07:32.332
+These files available in the GitHub repository in the Kubernetes in production directory volumes on AWS sub directory are exact copies
+你可在AWS子目录的生产目录卷中的Kubernetes选项中的GitHub存储库中找到
+
+92
+07:32.333 --> 07:35.366
+of what we used to define volumes on our minikube.
+我们在minikube用以定义卷的文件的确切副本
+
+93
+07:35.367 --> 07:41.366
+Again the only difference being they simply lack the local volumes file.
+同样，两者唯一的区别只是缺少本地卷文件。
+
+94
+07:41.367 --> 07:54.866
+We can see two files exist in our directory.
+我们可以在目录中看到这两个文件。
+
+95
+07:54.867 --> 07:58.866
+One for MySQL deployment and one for our WordPress deployment.
+一个用于MySQL部署，另一个用于WordPress部署。
+
+96
+07:58.867 --> 08:04.699
+As I mentioned they are exactly the same files that we used in the volumes one we are simply lacking the third file
+正如我提到的，它们与我们在第一卷中使用的文件完全相同，我们只是缺少
+
+97
+08:04.700 --> 08:06.632
+that created the local volumes.
+创建本地卷的第三个文件。
+
+98
+08:06.633 --> 08:11.566
+We'll use kubectl apply to create MySQL deployment first.
+我们将首先使用kubectl apply创建MySQL部署。
+
+99
+08:11.567 --> 08:25.532
+You'll notice that it create a service,
+您会注意到，它创建了一个服务
+
+100
+08:25.533 --> 08:27.366
+a persistent volume claim and a deployment.
+分别是一个持久卷声明和一个部署
+
+101
+08:27.367 --> 08:29.566
+But no persistent volume itself.
+不过却不是持久卷本身。
+
+102
+08:29.567 --> 08:35.332
+Remember we are relying on the underlying auto provisioner to do this for us since we're running on AWS.
+请记住，由于这是在AWS上运行，因此我们依赖于底层的自动提供程序来完成这一任务。
+
+103
+08:35.333 --> 08:37.932
+Let's do the same for the WordPress Deployment.
+请在进行WordPress部署时重复同一步骤。
+
+104
+08:37.933 --> 08:41.399
+Again you'll note the service was created,
+再一次，您将注意到服务已经创建
+
+105
+08:41.400 --> 08:45.132
+the persistent volume claim will be created and the deployment will be created.
+持久卷声明及部署将被创建。
+
+106
+08:45.133 --> 08:48.066
+And yet again no volume was actual created.
+然而，又一次，没有真正的卷被创造出来。
+
+107
+08:48.067 --> 08:53.399
+Again that's because we are relying on the underlying Kubernetes auto provisioner
+我在这里再说一遍，这是因为我们依赖于底层kubernetes自动提供程序。
+
+108
+08:53.400 --> 08:58.999
+to create an ABS volume for us and bind it to the persistent volume claim transparently.
+来为我们创建一个ABS卷，并将其透明地绑定到持久卷声明中。
+
+109
+08:59.000 --> 09:05.532
+Let's use the Kubectl
+让我们使用kubectl
+
+110
+09:05.533 --> 09:09.099
+describe persistent volumes command
+描述持久卷命令
+
+111
+09:09.100 --> 09:10.766
+to see if that's what happened.
+来查看是否会发生这样的情况。
+
+112
+09:10.767 --> 09:18.566
+Let's scroll up in the output to see what this means.
+让我们在输出中向上滚动，看看这意味着什么。
+
+113
+09:18.567 --> 09:24.399
+You can see that a persistent volume was created with a system-generated identifier.
+您可以看到，使用系统生成的标识符创建了一个持久卷。
+
+114
+09:24.400 --> 09:25.599
+Looks good.
+看起来不错。
+
+115
+09:25.600 --> 09:36.599
+20 GB volume was created as an AWS elastic block store persistent disk in AWS.
+20 GB卷是作为AWS弹性块存储持久磁盘在AWS中创建的。
+
+116
+09:36.600 --> 09:39.166
+This was done automatically for us.
+它是自动创建的。
+
+117
+09:39.167 --> 09:44.532
+We didn't manually create this and then if the files actually enumerated this.
+我们没有手动创建这个，而是文件实际上枚举了这个。
+
+118
+09:44.533 --> 09:47.299
+This was done by the auto provisioner,
+这是由自动提供程序完成的，
+
+119
+09:47.300 --> 09:51.966
+you can see the first one as for the MySQL PV claim.
+这是由自动提供程序完成的，您可以把看到的第一个视为MySQL持久卷的声明。
+
+120
+09:51.967 --> 10:03.299
+Further down you'll see the same thing exists for WordPress.
+再往下看，你会看到WordPress也存在同样的情况。
+
+121
+10:03.300 --> 10:10.466
+An important annotation that we can take note of
+我们可以注意到的一个重要批注是，
+
+122
+10:10.467 --> 10:16.066
+is that Kubernetes will market with an annotation that indicates
+kubernetes在进行市场营销时将使用一个批注以表明
+
+123
+10:16.067 --> 10:19.566
+that was created by the AWS EBS dynamic provisioner.
+这是由AWS EBS动态提供程序创建的。
+
+124
+10:19.567 --> 10:22.999
+This assures us that this wasn’t something that is manually created
+这让我们清楚的知道，这不是手工创建的
+
+125
+10:23.000 --> 10:24.866
+and also provides us with the ability
+而且还为我们提供了一种功能
+
+126
+10:24.867 --> 10:29.432
+to distinguish between things were auto provisioned and things we might created ourselves if we ever need to.
+让我们得以区分事物是自动进行配置还是那些在我们需要时自行创建的内容。
+
+127
+10:29.433 --> 10:37.432
+Now that we’ve examined everything in the actual Kubeclt interface,
+现在，我们已经检查了实际kubeclt接口中的所有内容，
+
+128
+10:37.433 --> 10:40.299
+let’s look at the other part that matters,
+让我们看看另一个重要的部分
+
+129
+10:40.300 --> 10:42.066
+the actual application.
+即实际应用程序。
+
+130
+10:42.067 --> 10:45.232
+Let's use the kubectl describe service WordPress command
+让我们像过去一样使用kubectl描述服务WordPress命令
+
+131
+10:45.233 --> 10:50.699
+as we have in the past to get the URL for the load balancer that serving up our WordPress service.
+获取为我们的WordPress服务提供服务的负载均衡器的URL。
+
+132
+10:50.700 --> 10:58.466
+Let's copy the URL of the load balancer and open it in a web browser.
+让我们复制负载平衡器的URL，并在Web浏览器中打开它。
+
+133
+10:58.467 --> 11:11.832
+Navigating to the URL we can see that WordPress was successfully installed.
+导航到URL，我们可以看到WordPress已成功安装
+
+134
+11:11.833 --> 11:28.899
+Remember the cluster running on AWS is accruing charges
+请记住，在AWS上运行集群是需要花钱的，
+
+162
+11:11.833 --> 11:28.899
+Remember the cluster running on AWS is accruing charges
+请记住，在AWS上运行集群是需要花钱的，
+
+163
+11:28.900 --> 11:34.232
+and now that we are complete here it's important that we either know that we are going to continue to accrue charges
+
+135
+11:28.900 --> 11:34.232
+and now that we are complete here it's important that we either know that we are going to continue to accrue charges
+因此当我们完成后，重要的是，我们是否要继续花钱去运行集群
+
+136
+11:34.233 --> 11:38.266
+or use the kops delete cluster command to delete the cluster
+或者是使用kops的销毁集群命令删除集群
+
+137
+11:38.267 --> 11:41.499
+and terminate the resources so we are no longer billed for them.
+并终止资源，这样我们就不会再为它们付费了。
+
+138
+11:41.500 --> 11:47.232
+As usual there are bugs in any kind of software.
+很正常的，任何类型的软件都有缺陷。
+
+139
+11:47.233 --> 11:50.566
+And there's no guarantee that kops will do everything
+而且也不能保证kops能够完成所有需要的事情
+
+140
+11:50.567 --> 11:52.266
+and delete everything it needs to.
+并删除一切它应该要删除的东西。
+
+141
+11:52.267 --> 11:54.199
+It should and that's what its assigned for.
+虽然这是它应该做到的-这就是它的任务。
+
+142
+11:54.200 --> 11:58.132
+But the best way to be sure is that when you are complete and done
+但是最安全的做法是，当您
+
+143
+11:58.133 --> 12:01.266
+with falling along with the demos in this lecture series
+依据本系列讲座中的演示执行并完成所有的学习后
+
+144
+12:01.267 --> 12:05.032
+delete and disable the Amazon AWS account entirely
+删除并完全禁用Amazon AWS帐户
+
+145
+12:05.033 --> 12:07.299
+to avoid any chance for further bill.
+以避免任何额外的费用。
+
+146
+12:07.300 --> 12:14.932
+We've seen how the cluster auto provisoner can automatic leverage underlying resources
+我们已经看到集群自动供应程序如何自动利用底层资源
+
+147
+12:14.933 --> 12:16.832
+to create volumes for us.
+为我们创建卷。
+
+148
+12:16.833 --> 12:20.866
+We don't have to create a persistent volume to fulfill persistent volume claims
+我们不需要创建一个持久卷来完成持久卷声明，
+
+149
+12:20.867 --> 12:24.966
+because the auto provisioner is smart enough that when available and appropriate
+因为自动提供程序足够聪明，在可用和适当时，
+
+150
+12:24.967 --> 12:27.266
+it's able to allocate resources for us.
+它能够为我们分配资源。
+
+151
+12:27.267 --> 12:28.832
+For example in the cloud.
+例如在云端中。
+
+152
+12:28.833 --> 12:32.432
+This maybe something you would like to leverage or not.
+这也许是一项你可自行决定是否要利用的东西。
+
+153
+12:32.433 --> 12:33.732
+And the choice is up to you.
+你可以自己做出决定。
+
+154
+12:33.733 --> 12:38.766
+Consult the Kubernetes documentation for what types of underlying volume types
+请参阅kubernetes文档，以了解哪一种底层卷类型
+
+155
+12:38.767 --> 12:40.566
+actual supports auto provisioning.
+真的支持自动配置
+
+156
+12:40.567 --> 12:44.232
+For example if physical machines may not be able to provision
+例如，物理机器可能无法提供更多空间
+
+157
+12:44.233 --> 12:48.732
+any more space unless an Administrator actually goes out and buys and installs more physical disks.
+除非管理员实际外出购买和安装更多物理磁盘。
+
+158
+12:48.733 --> 12:51.666
+This is somewhere where auto provisioning simple wouldn't work.
+这是自动配置无法起作用的地方。
+
+159
+12:51.667 --> 12:56.699
+The documentation has a wide array of information
+文档中包含了关于自动提供程序
+
+160
+12:56.700 --> 13:01.166
+on auto provisioner and  how it works in varying circumstances.
+及其在不同情况下如何工作的大量信息。
+
+161
+13:01.167 --> 13:05.300
+As it varies from provider to provider or from situation to situation.
+请记得它会因不同提供者或情况而异。
+到URL，我们可以看到WordPress已成功安装

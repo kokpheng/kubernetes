@@ -1,0 +1,893 @@
+WEBVTT
+
+1
+00:00.000 --> 00:06.599
+Theme music plays
+
+2
+00:06.600 --> 00:10.899
+You’ve probably heard the adage that any chain is only as strong as its weakest link
+
+3
+00:10.900 --> 00:14.666
+and perhaps you even experienced this in technology
+
+4
+00:14.667 --> 00:18.399
+that no matter how robust and well-written your application,
+
+5
+00:18.400 --> 00:21.666
+if the systems upon which your applications are running are unreliable
+
+6
+00:21.667 --> 00:27.399
+or perhaps even deeper down the power, cooling, or the buildings hosting them are unreliable.
+
+7
+00:27.400 --> 00:30.732
+The full stacks simply doesn't work or doesn’t work properly.
+
+8
+00:30.733 --> 00:35.832
+Similarly deployments running on Kubernetes are no different.
+
+9
+00:35.833 --> 00:38.466
+They’re only as reliable as Kubernetes itself.
+
+10
+00:38.467 --> 00:41.866
+The same applies to the various components that make up Kubernetes.
+
+11
+00:41.867 --> 00:46.232
+We've talked about Masters, nodes, kube-api and the like.
+
+12
+00:46.233 --> 00:49.432
+These are some of the components that make up Kubernetes
+
+13
+00:49.433 --> 00:51.132
+and its external control plane.
+
+14
+00:51.133 --> 00:56.632
+Without them, or without them functioning properly, applications running on Kubernetes
+
+15
+00:56.633 --> 01:02.066
+simply won’t function; won't function properly or won't perform to the standards that we expect them to.
+
+16
+01:02.067 --> 01:06.732
+Just like any other software system, Kubernetes components can fail.
+
+17
+01:06.733 --> 01:11.699
+Either because the underlying hardware, network or software they are running upon
+
+18
+01:11.700 --> 01:16.732
+experiencing an issue or the process itself has some sort of fault or bug.
+
+19
+01:16.733 --> 01:20.866
+In order to create a system that is resilient in light of failure,
+
+20
+01:20.867 --> 01:26.999
+if any one component or depending on the configuration perhaps even multiple failures in multiple components.
+
+21
+01:27.000 --> 01:31.466
+Kubernetes is architected and provides facilities for redundancy,
+
+22
+01:31.467 --> 01:35.599
+replication and graceful handling the faults within its system.
+
+23
+01:35.600 --> 01:40.499
+These together are considered the high-availability portions of Kubernetes.
+
+24
+01:40.500 --> 01:45.666
+We will discuss a few aspects of this in this lecture
+
+25
+01:45.667 --> 01:49.632
+and we’ll look at actually implementing them in future lectures.
+
+26
+01:49.633 --> 01:55.099
+Keep in mind this is an area of increasing development and focus in Kubernetes.
+
+27
+01:55.100 --> 01:58.132
+It’s not 100% complete, but is quite mature.
+
+28
+01:58.133 --> 02:02.932
+The high-availability features are continually being added upon
+
+29
+02:02.933 --> 02:11.332
+but the core feature set is complete and focuses on replicating Kubernetes' key infrastructure components
+
+30
+02:11.333 --> 02:16.966
+to provide a scalable, resilient and robust system for almost any instances.
+
+31
+02:16.967 --> 02:23.366
+Kubernetes itself is comprised of many components
+
+32
+02:23.367 --> 02:28.232
+and many of them you don’t even need to know about, even if you were a Kubernetes system developer.
+
+33
+02:28.233 --> 02:31.632
+For the purposes of understanding high availability however,
+
+34
+02:31.633 --> 02:38.632
+let’s review a few of the key components that relate to creating highly available Kubernetes clusters.
+
+35
+02:38.633 --> 02:45.066
+First for the Kubernetes Master is a machine running three processes on a node on a cluster,
+
+36
+02:45.067 --> 02:46.699
+or at least three processes.
+
+37
+02:46.700 --> 02:51.199
+These processes are the Kube-apiserver,
+
+38
+02:51.200 --> 02:54.366
+the Kube-controller-manager and the Kube-scheduler.
+
+39
+02:54.367 --> 03:00.932
+Second etcd is a consistent and a highly available distribute key store
+
+40
+03:00.933 --> 03:02.866
+that stores all clustered data.
+
+41
+03:02.867 --> 03:07.832
+Etcd itself actually isn’t provided or even maintain the Kubernetes project.
+
+42
+03:07.833 --> 03:09.699
+It’s a separate data store,
+
+43
+03:09.700 --> 03:11.499
+a separate key value database
+
+44
+03:11.500 --> 03:17.766
+that Kubernetes uses to store its data because it has solved the problem of having a fast,
+
+45
+03:17.767 --> 03:23.932
+scalable, distributed data store and Kubernetes didn’t want to reinvent the wheel.
+
+46
+03:23.933 --> 03:27.866
+Much like WordPress uses MySQL as a database,
+
+47
+03:27.867 --> 03:32.432
+Kubernetes uses ETCD as a database for master data.
+
+48
+03:32.433 --> 03:36.466
+ETCD can run on its own machines or the master machines,
+
+49
+03:36.467 --> 03:40.066
+however, it’s important to run etcd on its own.
+
+50
+03:40.067 --> 03:44.999
+And it’s not recommended to run it on the same machines that run the Master.
+
+51
+03:45.000 --> 03:50.532
+Many things can go wrong on any system.
+
+52
+03:50.533 --> 03:53.332
+No system is completely infallible.
+
+53
+03:53.333 --> 03:56.666
+But the design of Kubernetes is laid out with the intention
+
+54
+03:56.667 --> 03:59.766
+to provide resiliency and redundancy at most points.
+
+55
+03:59.767 --> 04:01.732
+And it is continuing to evolve.
+
+56
+04:01.733 --> 04:05.866
+Currently highly available Masters in Kubernetes
+
+57
+04:05.867 --> 04:09.232
+are accomplished by four key things for the Master
+
+58
+04:09.233 --> 04:11.299
+and Kubernetes control plain sight of things.
+
+59
+04:11.300 --> 04:14.632
+And then ensuring we have multiple worker nodes as well.
+
+60
+04:14.633 --> 04:18.032
+We’ll walk through each step one through four
+
+61
+04:18.033 --> 04:20.999
+and in the later lecture, we'll use Kubernetes tooling
+
+62
+04:21.000 --> 04:22.666
+to set a highly available cluster
+
+63
+04:22.667 --> 04:26.632
+and then we’ll look at step 5 to set up multiple worker nodes as well.
+
+64
+04:26.633 --> 04:30.999
+But for now we’ll just discuss each step at a high level
+
+65
+04:31.000 --> 04:33.466
+to lay the foundation of understanding;
+
+66
+04:33.467 --> 04:34.932
+for demos and for lectures.
+
+67
+04:34.933 --> 04:41.632
+First creating reliable nodes that together can form a highly available Master implementation is where we  start.
+
+68
+04:41.633 --> 04:47.866
+These are the actual Linux machines upon which or Masters etcd will actually run.
+
+69
+04:47.867 --> 04:51.832
+Second we’ll set up a redundant, reliable storage layer
+
+70
+04:51.833 --> 04:54.199
+with a cluster etcd implementation.
+
+71
+04:54.200 --> 04:59.066
+Third we’ll start replicated load balanced API service.
+
+72
+04:59.067 --> 05:06.232
+Fourth we'll set up Master elected, kube-scheduler and kube-controller-manager demons.
+
+73
+05:06.233 --> 05:09.466
+Each of these steps sounds really daunting I’m sure
+
+74
+05:09.467 --> 05:11.666
+and probably has things you don’t understand.
+
+75
+05:11.667 --> 05:13.666
+We’ll go over each one of them in a moment
+
+76
+05:13.667 --> 05:16.099
+and what it means. And rest assured
+
+77
+05:16.100 --> 05:19.999
+that Kubernetes provides us with a set of tools called kops
+
+78
+05:20.000 --> 05:21.332
+K O P S.
+
+79
+05:21.333 --> 05:24.399
+That will provide a level of automation
+
+80
+05:24.400 --> 05:26.799
+in setting up and managing each one of these,
+
+81
+05:26.800 --> 05:32.032
+while you could manually go and create the configuration files needed for each one of these.
+
+82
+05:32.033 --> 05:35.532
+Kubernetes provides a suite of tools called kops
+
+83
+05:35.533 --> 05:36.666
+K O P S
+
+84
+05:36.667 --> 05:39.599
+what provides a higher-level command line interface
+
+85
+05:39.600 --> 05:44.299
+to a lot of the tasks required to write configuration files and maintain them.
+
+86
+05:44.300 --> 05:46.999
+This provides an interface, which reduces errors
+
+87
+05:47.000 --> 05:50.532
+and can make you more efficient and automated if you choose use them.
+
+88
+05:50.533 --> 05:53.666
+But understanding what steps the tools are taking
+
+89
+05:53.667 --> 05:55.132
+is an important part of learning.
+
+90
+05:55.133 --> 05:56.632
+So we’ll go over each one.
+
+91
+05:56.633 --> 06:01.899
+First let’s look up and setting up a reliable system.
+
+92
+06:01.900 --> 06:05.366
+Up to this point we’ve worked with a mini-kube
+
+93
+06:05.367 --> 06:09.332
+where the master processes and node workers all work on the same machine.
+
+94
+06:09.333 --> 06:14.832
+If that machine lost power, restarts or is thrown out of a window and went into a pool
+
+95
+06:14.833 --> 06:16.132
+everything fails.
+
+96
+06:16.133 --> 06:18.566
+In simple Kubernetes clusters
+
+97
+06:18.567 --> 06:21.099
+while there is a Master and some nodes.
+
+98
+06:21.100 --> 06:27.432
+If the Master fails e.g. the data center it’s in goes down or it loses power or connectivity,
+
+99
+06:27.433 --> 06:30.766
+the cluster will cease to function no matter how many workers nodes there are.
+
+100
+06:30.767 --> 06:33.232
+In highly available systems
+
+101
+06:33.233 --> 06:35.266
+depending the number of Masters.
+
+102
+06:35.267 --> 06:39.332
+Even if individual Masters and machines running those Masters fail
+
+103
+06:39.333 --> 06:43.632
+other Masters can take over and provide the services of processes running on the Master.
+
+104
+06:43.633 --> 06:48.299
+One can build highly available systems with any degree of resiliency,
+
+105
+06:48.300 --> 06:52.132
+depending on how many master and instances of etcd are created
+
+106
+06:52.133 --> 06:54.599
+a certain number of failures can be tolerated.
+
+107
+06:54.600 --> 07:00.799
+For example ensuring these systems are as physically separated and independent as possible is important.
+
+108
+07:00.800 --> 07:04.832
+It is of little use if all of these machines are flooded and the same storm,
+
+109
+07:04.833 --> 07:09.499
+are burned the same fire, or lose connectivity because of the same fiber cut
+
+110
+07:09.500 --> 07:12.332
+in a fiber optic line leaving town.
+
+111
+07:12.333 --> 07:16.566
+Understanding what the variety of failures can be
+
+112
+07:16.567 --> 07:20.332
+and choosing which ones you'd like to design and hedge against.
+
+113
+07:20.333 --> 07:24.099
+Is important in understanding what architecture you should create.
+
+114
+07:24.100 --> 07:30.432
+In this diagram we can see the variety of facilities available to us
+
+115
+07:30.433 --> 07:32.332
+in creating a redundant system.
+
+116
+07:32.333 --> 07:37.066
+Multiple worker nodes and multiple Master notes which live behind the load balancer
+
+117
+07:37.067 --> 07:41.599
+are what creates a variety of the high availability systems in Kubernetes.
+
+118
+07:41.600 --> 07:45.299
+You can create multiple Master nodes in different parts of the country
+
+119
+07:45.300 --> 07:49.799
+so that if an Internet line is cut or fiber optic line is compromised
+
+120
+07:49.800 --> 07:53.032
+and a given city might have connectivity issues,
+
+121
+07:53.033 --> 07:55.799
+only the Master in that city is affected
+
+122
+07:55.800 --> 07:59.466
+and other Masters in other parts of country might be able to take over.
+
+123
+07:59.467 --> 08:04.966
+Similarly a natural disaster in one area that knock a data center off-line
+
+124
+08:04.967 --> 08:09.632
+doesn’t have to affect your worker nodes or your client applications
+
+125
+08:09.633 --> 08:14.866
+because the load balancer detects that Master node being gone and begins to send requests to other ones.
+
+126
+08:14.867 --> 08:18.932
+Let's look at how that is created.
+
+127
+08:18.933 --> 08:21.432
+Remember the four steps.
+
+128
+08:21.433 --> 08:24.266
+The first being reliable nodes for our Masters.
+
+129
+08:24.267 --> 08:30.766
+Each machine should be separated and single points of failure removed as much as is reasonable for your needs.
+
+130
+08:30.767 --> 08:33.932
+You may not need to have Masters located
+
+131
+08:33.933 --> 08:37.932
+in every major metro area in every country where you want run your application
+
+132
+08:37.933 --> 08:40.132
+or you may decide that that’s important.
+
+133
+08:40.133 --> 08:45.132
+That’s a choice that you have to make based on the needs of your application or your business.
+
+134
+08:45.133 --> 08:49.966
+This will vary based on the amount of redundancy you really need or are trying to accomplish.
+
+135
+08:49.967 --> 08:54.266
+For example it may be okay for you to have each machine in the same city,
+
+136
+08:54.267 --> 08:59.499
+if surviving a catastrophe that isolates your entire city isn’t important or considered so low probability,
+
+137
+08:59.500 --> 09:01.532
+it isn’t worth protecting against.
+
+138
+09:01.533 --> 09:10.299
+Remember everything we do when it relates to machines and technology might have a cost associated with operating it.
+
+139
+09:10.300 --> 09:14.299
+Running 10 Masters usually cost 10 times as much is running one
+
+140
+09:14.300 --> 09:19.432
+and distributing them across multiple geographic data centers
+
+141
+09:19.433 --> 09:23.166
+usually incurs some sort cost to begin with for them all to communicate.
+
+142
+09:23.167 --> 09:27.599
+Understanding your needs and aiding yourself against complexity and cost
+
+143
+09:27.600 --> 09:31.366
+is an important exercise of design in architecture of high availability.
+
+144
+09:31.367 --> 09:39.699
+For now just know that creating reliable nodes is an important basis point for everything we’ll do here on out.
+
+145
+09:39.700 --> 09:45.332
+Secondly we need to create a reliable data storage layer.
+
+146
+09:45.333 --> 09:49.266
+ETCD is a system that is a study in and of itself,
+
+147
+09:49.267 --> 09:52.832
+it something built entirely separate from Kubernetes and maintained separately.
+
+148
+09:52.833 --> 09:56.266
+Kubernetes uses it much like WordPress uses MySQL
+
+149
+09:56.267 --> 10:00.932
+as a data store that is built and managed by an entirely development organization.
+
+150
+10:00.933 --> 10:04.266
+Etcd itself has redundancy options
+
+151
+10:04.267 --> 10:09.466
+well beyond defaults that are typically used by the Kubernetes deployment tools what we’ll use.
+
+152
+10:09.467 --> 10:13.232
+If you need this explore the etcd documentation
+
+153
+10:13.233 --> 10:18.366
+or consult an etcd expert on how to further tune your etcd deployment
+
+154
+10:18.367 --> 10:20.832
+that is created for you by the Kubernetes tools.
+
+155
+10:20.833 --> 10:23.832
+It’s completely outside the scope of Kubernetes
+
+156
+10:23.833 --> 10:25.899
+as it is a different software system
+
+157
+10:25.900 --> 10:32.232
+and could be an area that is providing months or months of work and study on its own.
+
+158
+10:32.233 --> 10:35.232
+Examine these options if you need them
+
+159
+10:35.233 --> 10:37.132
+but for most applications you won't.
+
+160
+10:37.133 --> 10:41.366
+The next step is having replicated API servers.
+
+161
+10:41.367 --> 10:44.332
+Kubernetes API is a key process in a Master
+
+162
+10:44.333 --> 10:45.866
+and as such should run on all Masters.
+
+163
+10:45.867 --> 10:49.499
+Since clients need access to the Kube-api processes
+
+164
+10:49.500 --> 10:56.566
+for example Kubectl command line tool that you've been using to access information about your cluster.
+
+165
+10:56.567 --> 11:02.999
+Modify deployments, create deployment accesses is the Kube-API process on the Master.
+
+166
+11:03.000 --> 11:06.832
+A load balancer in front of the machines that are making up the Masters is critical
+
+167
+11:06.833 --> 11:12.499
+to ensure this process is exposed properly and a request from applications like Kubectl
+
+168
+11:12.500 --> 11:14.799
+are routed to an available Master.
+
+169
+11:14.800 --> 11:16.399
+Setting up a load balancer is very easy.
+
+170
+11:16.400 --> 11:19.166
+It exists outside the scope of Kubernetes
+
+171
+11:19.167 --> 11:21.999
+and Kubernetes doesn’t provide a load balancer facility
+
+172
+11:22.000 --> 11:25.466
+in and of itself although it does provide facilities for managing them.
+
+173
+11:25.467 --> 11:30.166
+We'll use a load balancer provided by Amazon web services
+
+174
+11:30.167 --> 11:32.666
+called elastic load balancer service.
+
+175
+11:32.667 --> 11:38.399
+In further lectures to create replicated API servers.
+
+176
+11:38.400 --> 11:43.666
+This varies depending on where your chosen deployment is.
+
+177
+11:43.667 --> 11:49.966
+Next and finally we will need to make sure the Master is what you set up
+
+178
+11:49.967 --> 11:54.132
+can speak to one another and elect who is going to be the active Master.
+
+179
+11:54.133 --> 11:57.366
+Now the items are actually set up and alive on the nodes,
+
+180
+11:57.367 --> 11:59.832
+we have the pieces in place but they actually aren't running.
+
+181
+11:59.833 --> 12:04.132
+We need to ensure that only one actor works the data at a given time.
+
+182
+12:04.133 --> 12:06.632
+This is the too many cooks in the kitchen
+
+183
+12:06.633 --> 12:08.966
+who aren't talking to each other problem you might have.
+
+184
+12:08.967 --> 12:13.266
+If you for example were trying to cook a meal with multiple cooks
+
+185
+12:13.267 --> 12:16.066
+there have to be some level coordination between who’s doing want.
+
+186
+12:16.067 --> 12:20.999
+Each Scheduler and Controller Manager will be started with a  --leader-elect flag
+
+187
+12:21.000 --> 12:24.066
+that will use something called a lease-lock API
+
+188
+12:24.067 --> 12:28.832
+between themselves to ensure only one instance of each is running or active at a given time.
+
+189
+12:28.833 --> 12:34.966
+In plain terms that means the Masters which are up and running and healthy
+
+190
+12:34.967 --> 12:38.766
+will communicate with each other and decide who is going to speak for the cluster.
+
+191
+12:38.767 --> 12:43.199
+They'll use a specific algorithm
+
+192
+12:43.200 --> 12:45.499
+and a specific protocol to do it amongst each other
+
+193
+12:45.500 --> 12:49.832
+and when one goes away the process will be repeated.
+
+194
+12:49.833 --> 12:55.499
+There are specific documentation available on how this works and the details of the process,
+
+195
+12:55.500 --> 12:59.932
+if you’d like to understand more about it, consult with Kubernetes design documentation
+
+196
+12:59.933 --> 13:03.366
+available in the Kubernetes Github repository.
+
+197
+13:03.367 --> 13:07.466
+For now and for most purposes simply understand
+
+198
+13:07.467 --> 13:11.666
+that there is some level of communication between the Masters, which is handled through etcd.
+
+199
+13:11.667 --> 13:19.632
+All this comes together to create a robust high available architecture
+
+200
+13:19.633 --> 13:24.032
+to ensure that we have multiple worker nodes in a variety of availability zones
+
+201
+13:24.033 --> 13:27.932
+to create a system that can withstand the kind of failures that you decide
+
+202
+13:27.933 --> 13:29.399
+might disrupt your application.
+
+203
+13:29.400 --> 13:34.732
+In further lectures we'll go through the process of setting these up.
+
+204
+13:34.733 --> 13:39.866
+For now even if you don’t understand the exact details of how this happens
+
+205
+13:39.867 --> 13:41.132
+and it is not expected that you should.
+
+206
+13:41.133 --> 13:46.632
+Understand and be comfortable with what happens in this diagram
+
+207
+13:46.633 --> 13:48.532
+when one Master might go away.
+
+208
+13:48.533 --> 13:51.166
+For example if Master node number one
+
+209
+13:51.167 --> 13:55.066
+were to experience failure the load balancer
+
+210
+13:55.067 --> 13:57.632
+would take any incoming request from worker nodes
+
+211
+13:57.633 --> 14:00.599
+or Kubectl and route it to a Master
+
+212
+14:00.600 --> 14:04.099
+which is actually working using standard load balancer functions.
+
+213
+14:04.100 --> 14:07.666
+When that Master comes back up
+
+214
+14:07.667 --> 14:10.666
+the load balancer might begin sending it requests
+
+215
+14:10.667 --> 14:13.332
+if it is chosen as the active Master.
+
+216
+14:13.333 --> 14:18.632
+Understanding what happens and how multiple Masters work together
+
+217
+14:18.633 --> 14:20.866
+and what happens on a Master is important.
+
+218
+14:20.867 --> 14:23.732
+How each of these happen
+
+219
+14:23.733 --> 14:27.199
+and individual details of the processes are less important
+
+220
+14:27.200 --> 14:29.732
+although we'll go into them through further lectures.
+
+221
+14:29.733 --> 14:34.799
+For now just think about how this diagram works
+
+222
+14:34.800 --> 14:36.899
+when multiple Masters exist
+
+223
+14:36.900 --> 14:42.500
+and what happens when a Master might go down.
