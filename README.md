@@ -63,6 +63,15 @@
       2. [Assign Limit](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#2-assign-limit)
       3. [Deploy Tomcat with Resource Request & Replica](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#3-deploy-tomcat-with-resource-request--replica)
       4. [See Deployment Status](7.Advanced%20-%20Namespaces%20%26%20Resource%20Quotas.md#4-see-deployment-status)
+- [8.Advanced - Auto Scaling.](8.Advanced%20-%20Auto%20Scaling.md)
+    - [Introduction](8.Advanced%20-%20Auto%20Scaling.md#introduction)
+    - [What Is The Horizontal Pod Autoscaler?](8.Advanced%20-%20Auto%20Scaling.md#what-is-the-horizontal-pod-autoscaler)
+    - [Creating an HPA?](8.Advanced%20-%20Auto%20Scaling.md#creating-an-hpa)
+    - [Practical Example](8.Advanced%20-%20Auto%20Scaling.md#practical-example)
+      1. [Apply wordpress deployment](8.Advanced%20-%20Auto%20Scaling.md#1-apply-wordpress-deployment)
+      2. [Add an HPA to Enable Auto-Scaling](8.Advanced%20-%20Auto%20Scaling.md#2-add-an-hpa-to-enable-auto-scaling)
+      3. [Simulate Using an Infinite HTTP Request Loop](8.Advanced%20-%20Auto%20Scaling.md#3-simulate-using-an-infinite-http-request-loop)
+      4. [Check the HPA status](8.Advanced%20-%20Auto%20Scaling.md#4-check-the-hpa-status)
 
 ## 🔖 Full Kubernetes references & Cheat Sheet
 - kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
