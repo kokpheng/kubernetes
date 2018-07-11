@@ -17,3 +17,16 @@ Solution: Enable Virtualization Techonology is enabled in BIOS.
 Solution: "minikube delete" and "minikube start" . [link](https://github.com/kubernetes/minikube/issues/2755#issuecomment-385624552 "Github")
 
 ```
+
+- Error Auto Scaling - timed out waiting for the condition: kubectl run -i --tty load-generator --image=busybox /bin/sh
+
+while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
+
+1. `minikube` no longer has `metrics-server` enabled by default. To enable it:
+```
+minikube addons enable metrics-server
+```
+2. Wordpress redirects to canonical name by default. Unfortunately, it believes that you should be using port 31938 so it redirects to that. In the actual container, nothing is listening to that port You could disable redirection by adding `remove_action('template_redirect', 'redirect_canonical');` to `wp-config.php`. However, I think it's much easier to just generate the load on your machine (only tested on Linux, YMMV):
+```
+while true; do wget -q -O -S $(minikube service wordpress --url); done
+```
