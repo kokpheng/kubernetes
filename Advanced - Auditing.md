@@ -1,0 +1,205 @@
+<h1 align="center">
+  <br>
+  <a href="https://kubernetes.io/"><img src="https://avatars1.githubusercontent.com/u/13629408?s=400&v=4" alt="Markdownify" width="200"></a>
+  <br>
+  Kubernetes
+  <br>
+</h1>
+
+[![Submit Queue Widget]][Submit Queue] [![GoDoc Widget]][GoDoc] [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/569/badge)](https://bestpractices.coreinfrastructure.org/projects/569)
+
+## 🚩 Table of Contents
+
+- [Introduction](#introduction)
+- [What Is Kubernetes Auditing?](#)
+- [The Audit Policy](#)
+- [The Audit Backend](#)
+- [Practical Example](#practical-example)
+  1. [Stop Minikube](#)
+  2. [Define an Audit Policy](#)
+  3. [Start Minikube with Audit Policy](#)
+- [References](#-full-kubernetes-references--cheat-sheet)
+- [Source Code Example](#-source-code-example)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+## Introduction
+
+In nearly any production computer system, an important aspect of operations is security and auditing. Auditing in the context of computer systems and production use, typically refers to understanding what is going on; how it happened; where it happened and who or what caused an event to happened. An important aspect of auditing is that the auditing process be safe from either unintentional or intentional interference by individuals who aren’t authorized to look at or change the records that the auditing process keeps. Outside the computing world auditing in a bank for example looks to make sure that the bank employees did what they were supposed to do. And if there’s ever a question there is a record which can be relied upon and trusted to reflect what actually happened to either investigate malfeasance, intentional and malicious behavior or simple mistakes.
+
+Kubernetes is the same. Since Kubernetes provides a framework for running all kinds of workloads which may require the same level of audit capability, Kubernetes provides an auditing facility.
+
+There’re two types of auditing in Kubernetes. Legacy auditing which was sun set in `Kubernetes version 1.7` and advanced auditing introduced in `1.8` and the standard audit and default audit system in 1.8 and beyond. We’ll only consider advanced auditing. And we’ll only refer to it as auditing as that is how it will be in future versions of Kubernetes.
+
+[(Back to top)](#-table-of-contents)
+
+## What Is Kubernetes Auditing?
+
+Kubernetes auditing provides a security-relevant chronological set of records documenting the sequence of activities that have affected the system.
+
+Kubernetes can help answer what happened, why, by whom, on what, where, how it was initiated, and where was it going?
+
+The kube-apiserver performs auditing according to the Audit Policy and sends records to the Audit Backend.
+
+The kube API service process performs the auditing and accounting. his is a little different from everything we’ve discussed to date. Most of the action we've taken by creating a service, creating a deployment, creating horizontal pod auto scaler. Or any other number of activities have been done inside the Kubernetes framework in your cluster. They've been executed as processes running inside Kubernetes. However auditing is important from a security perspective and needs to remain secure. So the auditing process happens at a lower level that cannot be accessed by the Kubectl runtime or pods running inside Kubernetes. This is important understand when we actually go to set up auditing. The Kube API server is what provides the auditing functionality and it’s configured from outside the cluster. emember much like you wouldn’t want an internal auditor in a bank o be the only source of data and trust. Because they might be easily corrupted. An external audit process or an external auditoris used to ensure that there is the appropriate controls in place that the audit record is not altered. Same thing here. Kubernetes auditing can be broken down into two large areas of concern.
+
+[(Back to top)](#-table-of-contents)
+
+## The Audit Policy
+
+- The Audit Policy defines what should be logged. Should we keep a record of every last thing that happens on the system or are we only interested in logging a few items. Where you fall in the spectrum likely is influenced by what your compliance needs are either legally or from a business prospectives or what you'd like to log.
+
+- The Audit Policy is defined in a .yaml file like any other Kubernetes object but since this is auditing, kubectl won’t help you much here!
+  - Auditing is defined on the kube-apiserver, it’s an option that’s passed to kube- apiserver when it starts, this varies by cluster. Since this is auditing it needs to happen outside the framework of the normal Kubernetes tools so that normal administrators and system users without access to certain parts of the system cannot alter the audit process either inadvertently or intentionally. Auditing is defined as Kube API server as we mentioned and it is an option that has passed the API server when it starts. So the commands that start up your Kubectl or your Kubernetes cluster is where we need to specify the audit policy. We can't do it once it is already started for reason of security and integrity, this varies by various cloud providers.
+
+  - Luckily, for minikube, we just pass a few options (like our Audit Policy) when we start minikube
+
+- Nearly anything you can create or do can be audited in Kubernetes. Setting the policy restricts what is audited and how.
+
+[(Back to top)](#-table-of-contents)
+
+## The Audit Backend
+
+- Audit Backends export audit events to external storage. Audit backend can range in sophistication and you could have custom backends to send information to nearly any system a variety of external compliance systems exist and Kubernetes can send events to these external compliance systems
+
+- Out of the box, kube-apiserver provides two backends
+  - Logs - which writes events to a disk or in the case of Minikube you can even write your screen.
+  - Webhooks - sends events to an external API/system. This provides a gateway and pathway for compatibility with wide variety of external systems that save logs, audit logs or send them to other systems for compliance.
+
+[(Back to top)](#-table-of-contents)
+
+## Practical Example
+
+- Let’s set up a simple Audit Policy to log all requests regarding Metadata,
+this will let us see what Audit data looks like without overload. Since you can audit any number of events and hundreds of thousands of events might occur per second in a production Kubernetes cluster. We don’t want to necessarily be drinking out of a fire hose. So let’s just look at something modest like metadata.
+
+- We’ll configure minikube to log it to a file on our system or the screen on our laptop.
+
+- Our Steps:
+  1. Stop Minikube (if running). Because we need to affect changes to how Minikube starts up.
+  2. Define an Audit Policy
+  3. Start Minikube with Audit Policy defined and appropriate options to make sure that it deploys a audit backend to save the data to a file or to our screen.
+
+### 1. Stop Minikube
+It's important to stop Minikube because we need to change how Minikube starts. We need to set a set of variety of options at runtime to enable auditing. In a production system this is going to vary based on what operating system your clusters is running on or what cloud provider is running on. Since it has to do with how the Kubernetes cluster is started this varies configuration by configuration.
+
+In a production system consult in your design documentation or your cloud service providers documentation as to how you set the options. With Minikube we simply pass a variety of commandline options to the Minikube process when we do Minikube start. In order to pass the options to enable auditing and specify what we’d like to audit the audit policy and where we would like the audit information to go the audit backend.
+```
+minikube stop
+```
+[(Back to top)](#-table-of-contents)
+
+### 2. Define an Audit Policy
+
+The [audit-policy.yaml](source-codes/Advanced%20Kubernetes%20Usage/Auditing/audit-policy.yaml) file specifies a very simple audit policy to audit metadata actions. Metadata actions meaning anything that has to do with information in the Kubectl commands. Anything against API server which is accessing metadata. For example information about pods. You can audit any variety of information in Kubernetes and you consult Kubernetes documentation for a full list of things you can audit.
+
+Let’s have a look at the [audit-policy.yaml](source-codes/Advanced%20Kubernetes%20Usage/Auditing/audit-policy.yaml) file. You can see that it’s relatively simple. It defines a type of object, `Policy` with one rule to audit anything at the `Metadata level`. Remember you can audit a blindingly large amount of data points in Kubernetes. We chose only auditing metadata to keep the amount available low and useful.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-372d7bcd.png)
+
+Let's copy this audit-policy file to an appropiate place where Minikube can access it. Minikube stores it's configuration in the users Home directory `~` that stands for users directory `.minikube/directory/addons/`. This directory is mounted to the virtual machine that's running minikube on your system. Any files here will be accessible by the Kubernetes processes running in the virtual machine which are your Minikube.
+
+
+So let’s copy the audit policy here, so that way we can tell Minikube when it starts up to expect the audit policy file in that area which is accessible to all processes running insider our minikube.
+```
+cp audit-policy.yaml ~/.minikube/addons/
+```
+
+Don’t quite start the Minikube command yet because we need to use a special `minikube start` command that specifying a variety of command line options so minikube understands to turn on auditing, what to audit and where to audit too.
+
+This command is a little verbose to say the least. Meaning it’s a little long, so I've provided a shell script that you can run that will do it for you. Instead of just trusting to the shell script has it right, let’s actually look at the shell script and run the command manually.
+
+Let’s use the cat command to look at the [minikubeStartWithAudit.sh](source-codes/Advanced%20Kubernetes%20Usage/Auditing/minikubeStartWithAudit.sh) shell script.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-80e7609a.png)
+
+You’ll see that it starts off relatively predictablely `minikube start`. But we’re providing three specific command line options to minikube using the `–-extra–config` parameter to tell minikube a few things to communicate to the API server.
+- First we are telling it to turn on authorization `Mode` call `RBAC`. You don’t need to worry about this right now just consider and know that that’s a requirement and a prerequisite of auditing function properly.
+- Secondly we’re telling the `apiserver` a `LogOption.Path`. That’s basically where do you want the log to be stored on the system and the virtual machine running minikube `/var/logs/audit.log` is what we've chosen.
+- The final option is important, it tells to Kubernetes and minikube where it can access any extra the configuration items such as our `audit policy`. In this case `/etc/kubernetes/addons/audit–policy.yaml` is the policy file that we just copied into the Add-ons directory in the minikube configuration file. This is mounted in the minikube virtual machine at` /etc/kubernetes`.
+
+### 3. Start Minikube with Audit Policy
+You can copy and pasting it. It may take a moment for minikube to startup, so let’s wait until Minikube has successfully started up then we have control over our shell yet again.
+```
+minikube start --extra-config=apiserver.Authorization.Mode=RBAC --extra-config=apiserver.Audit.LogOptions.Path=/var/logs/audit.log --extra-config=apiserver.Audit.PolicyFile=/etc/kubernetes/addons/audit-policy.yaml
+```
+
+![](Advanced - Auditing.assets/Advanced - Auditing-5ea3f393.png)
+
+Now that Minikube is running let’s you kubectl to get some kind of information that will trigger an event which requires auditing. `kubectl get pods` will do exactly that because we’re getting information about something on the system, it’ll generate a metadata event. This gave us information about the pods running on our minikube.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-5a47aafb.png)
+
+Now how do we actually look at this log data. We'll have to use the `minikube ssh` command. To SSH or create a secure shell connection into the machine running Minikube, this is a virtual machines that's running on the machine that we've logged into right now.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-d59632f1.png)
+
+This connects us into minikube and you’ll remember the parameter that we passed into minikube when we started it told minikube to store the data in `/var/logs/audit.log`.
+
+
+Let’s assume superuser command and authority using `sudo bash` so we get permission to read this file. Now let’s navigate to `/var/logs`. Let’s use the `cat` command to look at `audit.log`.
+```
+sudo bash
+cd /var/logs
+cat audit.log
+```
+![](Advanced - Auditing.assets/Advanced - Auditing-b1c7dbd2.png)
+
+As you can see there’re variety of messages in the Json format which is a format that used through variety of web services and systems logging a whole variety of data that is happened to this point relating to metadata. We can scroll through this data and begin to see that they are events which we are talking about any number of actions against metadata. This information logs, anything against metadata that is happened since we enabled auditing.
+
+Of course this isn’t very useful for human consumption but that typically isn’t the use case. Usually auditing data needs to be sent to an entirely separate compliance system which will actually enjoy this highly structured data that you see here. So we can look at it in a little cleaner fashion. Let’s use the `jq` command which formats JSON data, this is available in nearly any Lunix, or Mac system and is installed by default on the Minikube system.
+
+```
+cat audit.log | jq .
+```
+You can see it’s putting the log on our console with a whole lot more formatting and coloring in a human readable and friendly fashion.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-2986b78c.png)
+
+There is a lot of data here. But if we scroll through it will notice a few events of interest.
+
+For example for example if we scroll through we'll notice that the system made a request to examine `persistentvolumes`. This happened as we were starting minikube. Kubernetes needed to know what persistent volumes were available to fulfill a persistent volume claim, you'll notice in this case the request was received at a given `time` in this case you have to trust me that was a few minutes ago. And what object it worked against. A persistent volume claim with this identifier `name`. If we'd like to know more about this, you could copy this identifier and use Kubectl command to list information about that.
+
+If you continue to scroll down, you’ll see the response was completed and sent back to the source IP 127.0.0.1 In that case we know that the response originated and ended on our local system. It was the Kubernetes processes running in minikube that wanted information about this given resource. That’s the purpose of auditing. o answer and know conclusively what’s happening in your system by who and when.
+
+![](Advanced - Auditing.assets/Advanced - Auditing-23c8c035.png)
+
+Let’s log out of our super user shell using the `exit` command. Let's logout of our  Minikube SSH session using the `exit` command.
+
+This is just beginning of auditing and logging. You can audit many more points by looking through the Kubernetes documentation and seeing specifically what options are available to log. You can log much more than metadata, you can log actions etc. and create sophisticated rules to only log certain namespaces or certain pods or certain actions to get only data that you like and nothing more and nothing less.
+
+Secondly there’s a variety of ways that you can send a log data to systems which can process it an automated fashion or present for your consumption or your auditor's  consumption or store it in a compliant manner however you would need.
+
+According to data retention policies. Examine the documentation for Kubernetes and whatever third party systems you might be using to store and analyze log data as how you can integrate them. You’ll still use the same framework of audit policies and audit backends to achieve a variety of system configurations to meet your needs or the needs of the applications you might run.
+
+[(Back to top)](#-table-of-contents)
+
+## 🔖 Full Kubernetes references & Cheat Sheet
+- kubectl reference: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+- kubectl cheat sheet: https://kubernetes.io/docs/user-guide/kubectl-cheatsheet/
+
+
+## 📙 Source Code Example
+- You can download latest code from [here](source-codes).
+
+[(Back to top)](#-table-of-contents)
+
+## 💬 Contributing
+
+Your contributions are always welcome! :tada:
+
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
+
+## 📜 License
+
+The MIT License (MIT) 2018
+> GitHub [@yinkokpheng](https://github.com/yinkokpheng)
+
+[GoDoc]: https://godoc.org/k8s.io/kubernetes
+[GoDoc Widget]: https://godoc.org/k8s.io/kubernetes?status.svg
+[Submit Queue]: http://submit-queue.k8s.io/#/ci
+[Submit Queue Widget]: http://submit-queue.k8s.io/health.svg?v=1
